@@ -1,6 +1,6 @@
 from setuptools import setup
 
-from . import edi
+import edi
 
 setup(name='Edi',
       description='Simple and elegant Slack bot',
@@ -20,6 +20,6 @@ setup(name='Edi',
       license='MIT License',
       packages=['edi'],
       package_data={'edi': ['defaults.yaml']},
-      requires=['ent>=0.3.0', 'slacker'],
+      requires=['ent', 'slacker'],
       scripts=['bin/edi'],
       )
