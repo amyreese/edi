@@ -21,5 +21,5 @@ setup(name='Edi',
       packages=['edi'],
       package_data={'edi': ['defaults.yaml']},
       requires=['ent>=0.3.0', 'slacker'],
-      #scripts=['bin/edi],
+      scripts=['bin/edi'],
       )
