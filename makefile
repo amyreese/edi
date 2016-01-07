@@ -1,18 +1,18 @@
 
 build:
-	python setup.py build
+	python3 setup.py build
 
 dev:
-	python setup.py develop
+	python3 setup.py develop
 
 upload:
-	python setup.py sdist upload
+	python3 setup.py sdist upload
 
 lint:
-	python -m flake8 --show-source .
+	python3 -m flake8 --show-source .
 
 test:
-	python -m unittest tests
+	python3 -m unittest tests
 
 clean:
 	rm -rf build dist README MANIFEST edi.egg-info

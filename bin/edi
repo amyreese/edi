@@ -4,3 +4,5 @@
 # Licensed under the MIT license
 
 import edi
+
+edi.init_from_cli().start()
