@@ -20,6 +20,6 @@ setup(name='Edi',
       license='MIT License',
       packages=['edi'],
       package_data={'edi': ['defaults.yaml']},
-      requires=['ent', 'slacker'],
+      install_requires=['ent', 'slacker'],
       scripts=['bin/edi'],
       )
