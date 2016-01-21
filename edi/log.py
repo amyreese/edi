@@ -9,7 +9,8 @@ from logging import Formatter, StreamHandler, FileHandler
 Log = logging.getLogger('edi')
 
 
-def init_logger(stdout=True, file_path=None, debug=False):
+def init_logger(stdout: bool = True, file_path: str = None,
+                debug: bool = False) -> logging.Logger:
     '''Initialize the logging system for stdout and an optional log file.'''
 
     level = logging.DEBUG if debug else logging.INFO

@@ -3,28 +3,30 @@
 
 from argparse import ArgumentParser
 from os import path
+from typing import List
 
 from .config import Config
 from .log import Log, init_logger
 
 
 class Edi(object):
-    def __init__(self, config):
+
+    def __init__(self, config: Config) -> None:
         self.config = config
         self.slack = None
 
         Log.debug('Edi ready')
 
     @property
-    def connected(self):
+    def connected(self) -> bool:
         return self.slack is not None
 
-    def start(self):
+    def start(self) -> None:
         Log.info('starting event loop')
         pass
 
 
-def init_from_config(config):
+def init_from_config(config: Config) -> Edi:
     '''Initialize Edi from a loaded `Config` object.'''
 
     init_logger(stdout=True, file_path=config.log, debug=config.debug)
@@ -33,7 +35,7 @@ def init_from_config(config):
     return Edi(config)
 
 
-def init_from_cli(argv=None):
+def init_from_cli(argv: List[str] = None) -> Edi:
     '''Initialize Edi from the CLI, using sys.argv (default) or an optional
     list of arguments.'''
 
@@ -49,7 +51,7 @@ def init_from_cli(argv=None):
     return init_from_config(config)
 
 
-def parse_args(argv=None):
+def parse_args(argv: List[str] = None) -> object:
     '''Parse and perform basic validation of CLI options.'''
 
     parser = ArgumentParser(description='simple Slack bot')

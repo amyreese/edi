@@ -8,7 +8,7 @@ from os import path
 class Config(Ent):
 
     @classmethod
-    def load_defaults(cls):
+    def load_defaults(cls) -> 'Config':
         '''Load the default configuration and return the object.'''
 
         cwd = path.abspath(path.dirname(__file__))
@@ -19,7 +19,7 @@ class Config(Ent):
             return Config.load(contents)
 
     @classmethod
-    def load_from_file(cls, file_path):
+    def load_from_file(cls, file_path) -> 'Config':
         '''Given a path to a local configuration file, read the config file and
         merge its contents onto the default configuration.'''
 
