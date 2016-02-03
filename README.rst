@@ -3,6 +3,9 @@ Edi
 
 Simple and elegant Slack bot.
 
+.. image:: https://travis-ci.org/jreese/edi.svg?branch=master
+    :target: https://travis-ci.org/jreese/edi
+
 
 License
 -------
