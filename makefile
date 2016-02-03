@@ -1,3 +1,5 @@
+README:
+	cp README.rst README
 
 build:
 	python3 setup.py build
@@ -5,7 +7,7 @@ build:
 dev:
 	python3 setup.py develop
 
-upload:
+upload: README
 	python3 setup.py sdist upload
 
 lint:
