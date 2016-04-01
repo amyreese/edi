@@ -2,7 +2,6 @@
 # Licensed under the MIT license
 
 import asyncio
-import time
 
 from .log import Log
 
@@ -59,7 +58,7 @@ class Task(object):
         self._task.cancel()
 
     @classmethod
-    def start(cls, delay: float = 0.0) -> None:
+    def start(cls, delay: float=0.0) -> None:
         '''Instantiate the task object, and insert it in the asyncio event
         loop with the given delay in seconds.'''
 
@@ -72,9 +71,8 @@ class Task(object):
 
         asyncio.get_event_loop().call_later(delay, task.start_task)
 
-
     @classmethod
-    async def stop_all(cls, timeout: float = 10.0, step: float = 2.0) -> None:
+    async def stop_all(cls, timeout: float=10.0, step: float=2.0) -> None:
         '''Stop all scheduled and/or executing tasks, first by asking nicely,
         and then by waiting up to `timeout` seconds before forcefully stopping
         the asyncio event loop.'''
@@ -118,7 +116,8 @@ class PeriodicTask(Task):
             before = loop.time()
             await self.run()
             total = loop.time() - before
-            Log.debug('finished periodic task %s in %d seconds', self.name, total)
+            Log.debug('finished periodic task %s in %d seconds',
+                      self.name, total)
 
             sleep = self.INTERVAL - total
             if sleep > 0:

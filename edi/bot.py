@@ -85,7 +85,7 @@ def init_from_config(config: Config) -> Edi:
     return Edi(config)
 
 
-def init_from_cli(argv: List[str] = None) -> Edi:
+def init_from_cli(argv: List[str]=None) -> Edi:
     '''Initialize Edi from the CLI, using sys.argv (default) or an optional
     list of arguments.'''
 
@@ -101,7 +101,7 @@ def init_from_cli(argv: List[str] = None) -> Edi:
     return init_from_config(config)
 
 
-def parse_args(argv: List[str] = None) -> object:
+def parse_args(argv: List[str]=None) -> object:
     '''Parse and perform basic validation of CLI options.'''
 
     parser = ArgumentParser(description='simple Slack bot')
