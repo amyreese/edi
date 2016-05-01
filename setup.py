@@ -21,6 +21,7 @@ setup(
     license='MIT License',
     install_requires=[
         'ent',
+        'tasky',
         'slacker',
         'typing',
         'websockets',
