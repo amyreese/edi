@@ -5,4 +5,4 @@
 
 import edi
 
-edi.init_from_cli().start()
+edi.init_from_cli()

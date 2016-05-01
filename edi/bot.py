@@ -9,7 +9,7 @@ from argparse import ArgumentParser
 from os import path
 from typing import List
 
-from tasky import Task, PeriodicTask, TimerTask
+from tasky import Tasky, Task, PeriodicTask, TimerTask
 
 from .config import Config
 from .log import Log, init_logger
@@ -32,6 +32,8 @@ class TimerTest(TimerTask):
 class Edi(Task):
 
     def __init__(self, config: Config) -> None:
+        super().__init__()
+
         self.config = config
         self.slack = None
         self.loop = None
@@ -50,8 +52,8 @@ class Edi(Task):
             self.slack = conn
             Log.info('connected')
 
-            SecondLoop.start()
-            TimerTest.start()
+            self.tasky.insert(SecondLoop)
+            self.tasky.insert(TimerTest)
 
             counter = 0
             while self.running and counter <= 3:
@@ -65,33 +67,15 @@ class Edi(Task):
         self.slack = None
         Log.info('main loop completed')
 
-    def ctrlc(self) -> None:
-        if self.connected and self.stop_attempts < 1:
-            Log.info('stopping main loop')
-            self.running = False
-            self.stop_attempts += 1
-        else:
-            Log.info('force stopping event loop')
-            self.loop.stop()
-
-    def start(self) -> None:
-        Log.info('starting event loop')
-
-        self.loop = asyncio.get_event_loop()
-        self.loop.add_signal_handler(signal.SIGINT, self.ctrlc)
-        self.loop.run_until_complete(self.start_task())
-        self.loop.run_until_complete(Task.stop_all())
-
-        Log.info('event loop stopped')
-
-
 def init_from_config(config: Config) -> Edi:
     '''Initialize Edi from a loaded `Config` object.'''
 
     init_logger(stdout=True, file_path=config.log, debug=config.debug)
     Log.debug('logger initialized')
 
-    return Edi(config)
+    tasky = Tasky()
+    tasky.insert(Edi, 0, config)
+    return tasky.run_until_complete()
 
 
 def init_from_cli(argv: List[str]=None) -> Edi:
