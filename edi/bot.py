@@ -74,7 +74,7 @@ def init_from_config(config: Config) -> Edi:
     Log.debug('logger initialized')
 
     tasky = Tasky()
-    tasky.insert(Edi, 0, config)
+    tasky.insert(Edi(config))
     return tasky.run_until_complete()
 
 
