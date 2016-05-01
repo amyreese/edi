@@ -9,7 +9,8 @@ from argparse import ArgumentParser
 from os import path
 from typing import List
 
-from .common import Task, PeriodicTask
+from tasky import Task, PeriodicTask, TimerTask
+
 from .config import Config
 from .log import Log, init_logger
 
@@ -19,6 +20,13 @@ class SecondLoop(PeriodicTask):
 
     async def run(self):
         Log.info('second loop running')
+
+
+class TimerTest(TimerTask):
+    DELAY = 3.0
+
+    async def run(self):
+        Log.info('timer task running')
 
 
 class Edi(Task):
@@ -43,6 +51,7 @@ class Edi(Task):
             Log.info('connected')
 
             SecondLoop.start()
+            TimerTest.start()
 
             counter = 0
             while self.running and counter <= 3:
