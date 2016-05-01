@@ -13,8 +13,10 @@ def init_logger(stdout: bool=True, file_path: str=None,
                 debug: bool=False) -> logging.Logger:
     '''Initialize the logging system for stdout and an optional log file.'''
 
+    log = logging.getLogger('')
+
     level = logging.DEBUG if debug else logging.INFO
-    Log.setLevel(level)
+    log.setLevel(level)
 
     logging.addLevelName(logging.ERROR, 'E')
     logging.addLevelName(logging.WARNING, 'W')
@@ -34,13 +36,13 @@ def init_logger(stdout: bool=True, file_path: str=None,
         else:
             handler.setFormatter(stdout_fmt)
 
-        Log.addHandler(handler)
+        log.addHandler(handler)
 
     if file_path:
         handler = FileHandler(file_path)
         handler.setLevel(logging.DEBUG)
         handler.setFormatter(verbose_fmt)
 
-        Log.addHandler(handler)
+        log.addHandler(handler)
 
-    return Log
+    return log
