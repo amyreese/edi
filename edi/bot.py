@@ -2,7 +2,6 @@
 # Licensed under the MIT license
 
 import asyncio
-import signal
 import websockets
 
 from argparse import ArgumentParser
@@ -66,6 +65,7 @@ class Edi(Task):
 
         self.slack = None
         Log.info('main loop completed')
+
 
 def init_from_config(config: Config) -> Edi:
     '''Initialize Edi from a loaded `Config` object.'''
