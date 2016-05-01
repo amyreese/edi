@@ -23,18 +23,20 @@ def init_logger(stdout: bool=True, file_path: str=None,
     logging.addLevelName(logging.INFO, 'I')
     logging.addLevelName(logging.DEBUG, 'V')
 
-    stdout_fmt = Formatter('%(levelname)s: %(message)s')
-    verbose_fmt = Formatter('%(asctime)s  %(levelname)s  '
-                            '%(module)s:%(funcName)s  %(message)s')
+    date_fmt = r'%H:%M:%S'
+    stdout_fmt = ('%(levelname)s: %(message)s')
+    verbose_fmt = ('%(asctime)s,%(msecs)d %(levelname)s '
+                   '%(module)s:%(funcName)s():%(lineno)d   '
+                   '%(message)s')
 
     if stdout:
         handler = StreamHandler(sys.stdout)
         handler.setLevel(level)
 
         if debug:
-            handler.setFormatter(verbose_fmt)
+            handler.setFormatter(Formatter(verbose_fmt, date_fmt))
         else:
-            handler.setFormatter(stdout_fmt)
+            handler.setFormatter(Formatter(stdout_fmt, date_fmt))
 
         log.addHandler(handler)
 
