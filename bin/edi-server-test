@@ -4,6 +4,7 @@
 # Licensed under the MIT license
 
 import asyncio
+import random
 import signal
 import websockets
 
@@ -14,6 +15,7 @@ async def mirror(websocket, path):
         try:
             msg = await websocket.recv()
             print('received "%s"' % msg)
+            await asyncio.sleep(random.randint(1, 5))
             await websocket.send(msg)
 
         except websockets.exceptions.ConnectionClosed:
