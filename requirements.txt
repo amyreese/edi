@@ -1,5 +1,5 @@
 ent>=0.3.1
-tasky>=0.2.0
+tasky>=0.3.0
 slacker
 typing
 websockets
