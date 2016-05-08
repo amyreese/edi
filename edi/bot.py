@@ -2,30 +2,19 @@
 # Licensed under the MIT license
 
 import asyncio
+import json
 import websockets
 
 from argparse import ArgumentParser
 from os import path
 from typing import List
 
+from ent import Ent
 from tasky import Tasky, Task, PeriodicTask, TimerTask
 
 from .config import Config
 from .log import Log, init_logger
-
-
-class SecondLoop(PeriodicTask):
-    INTERVAL = 5.0
-
-    async def run(self):
-        Log.info('second loop running')
-
-
-class TimerTest(TimerTask):
-    DELAY = 3.0
-
-    async def run(self):
-        Log.info('timer task running')
+from .slack import slacker
 
 
 class Edi(Task):
@@ -35,36 +24,53 @@ class Edi(Task):
 
         self.config = config
         self.slack = None
-        self.loop = None
-        self.running = True
-        self.stop_attempts = 0
+        self.conn = None
 
         Log.debug('Edi ready')
 
-    @property
-    def connected(self) -> bool:
-        return self.slack is not None
+    async def connect(self) -> None:
+        self.slack = slacker.Slacker(self.config.token)
+
+        rtm_response = self.slack.rtm.start()
+        if rtm_response.error:
+            Log.error('Error requesting RTM connection: %s',
+                      rtm_response.error)
+            return False
+
+        Log.info('Connecting to websocket URL %s', rtm_response.url)
+        self.conn = await websockets.connect(rtm_response.url)
+        Log.info(self.conn)
+
+        return rtm_response
 
     async def run(self) -> None:
-        Log.info('in main loop')
-        async with websockets.connect('ws://localhost:2345') as conn:
-            self.slack = conn
-            Log.info('connected')
+        response = await self.connect()
 
-            self.tasky.insert(SecondLoop)
-            self.tasky.insert(TimerTest)
+        if not response:
+            Log.error('Connection failed, stopping Edi')
+            return
 
-            counter = 0
-            while self.running and counter <= 3:
-                Log.info('sending %s', counter)
-                await conn.send(str(counter))
-                retval = await conn.recv()
-                Log.info('received %s', retval)
-                await asyncio.sleep(1.0)
-                counter += 1
+        while self.running and not self.task.cancelled():
+            try:
+                msg = await self.conn.recv()
+                Log.info(msg)
 
-        self.slack = None
-        Log.info('main loop completed')
+            except websockets.ConnectionClosed:
+                Log.info('Connection closed')
+                break
+
+            except:
+                Log.exception('Exception from RTM')
+                break
+
+        Log.info('Goodbye!')
+
+    async def stop(self) -> None:
+        if self.conn:
+            Log.debug('closing RTM connection')
+            await self.conn.close()
+
+        await super().stop()
 
 
 def init_from_config(config: Config) -> Edi:
