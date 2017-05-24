@@ -1,4 +1,4 @@
-# Copyright 2016 John Reese
+# Copyright 2017 John Reese
 # Licensed under the MIT license
 
 from ent import Ent, yaml
