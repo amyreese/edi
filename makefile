@@ -11,7 +11,7 @@ upload: README
 	python3 setup.py sdist upload
 
 lint:
-	-mypy --ignore-missing-imports .
+	mypy --ignore-missing-imports .
 	python3 -m flake8 --show-source .
 
 test: lint
