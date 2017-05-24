@@ -11,7 +11,7 @@ except ImportError:
 
 from argparse import ArgumentParser
 from os import path
-from typing import List
+from typing import Any, List
 
 from .config import Config
 from .log import Log, init_logger
@@ -24,7 +24,7 @@ class Edi:
         self.config = config
         self.slack = None
         self.conn = None
-        self.loop = None
+        self.loop: asyncio.AbstractEventLoop = None
 
         Log.debug('Edi ready')
 
@@ -61,16 +61,16 @@ class Edi:
         self.loop.stop()
 
 
-def init_from_config(config: Config) -> Edi:
+def init_from_config(config: Config) -> None:
     '''Initialize Edi from a loaded `Config` object.'''
 
     init_logger(stdout=True, file_path=config.log, debug=config.debug)
     Log.debug('logger initialized')
 
-    return Edi(config).start()
+    Edi(config).start()
 
 
-def init_from_cli(argv: List[str]=None) -> Edi:
+def init_from_cli(argv: List[str]=None) -> None:
     '''Initialize Edi from the CLI, using sys.argv (default) or an optional
     list of arguments.'''
 
@@ -86,7 +86,7 @@ def init_from_cli(argv: List[str]=None) -> Edi:
     return init_from_config(config)
 
 
-def parse_args(argv: List[str]=None) -> object:
+def parse_args(argv: List[str]=None) -> Any:
     '''Parse and perform basic validation of CLI options.'''
 
     parser = ArgumentParser(description='simple Slack bot')
@@ -98,7 +98,7 @@ def parse_args(argv: List[str]=None) -> object:
     parser.add_argument('--log', type=str, default=None, metavar='PATH',
                         help='path to log program output')
 
-    options = parser.parse_args(argv)
+    options: Any = parser.parse_args(argv)
 
     if path.isdir(options.config):
         options.config = path.join(options.config, 'config.yaml')

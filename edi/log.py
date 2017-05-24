@@ -29,6 +29,8 @@ def init_logger(stdout: bool=True, file_path: str=None,
                    '%(module)s:%(funcName)s():%(lineno)d   '
                    '%(message)s')
 
+    handler: logging.Handler
+
     if stdout:
         handler = StreamHandler(sys.stdout)
         handler.setLevel(level)
@@ -43,7 +45,7 @@ def init_logger(stdout: bool=True, file_path: str=None,
     if file_path:
         handler = FileHandler(file_path)
         handler.setLevel(logging.DEBUG)
-        handler.setFormatter(verbose_fmt)
+        handler.setFormatter(Formatter(verbose_fmt, date_fmt))
 
         log.addHandler(handler)
 

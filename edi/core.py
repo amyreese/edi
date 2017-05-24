@@ -2,6 +2,7 @@
 # Licensed under the MIT license
 
 from ent import Ent
+from .edi import Edi
 from .log import Log
 
 
@@ -13,7 +14,7 @@ class Message(Ent):
 class Unit:
     ENABLED = True
 
-    def __init__(self, edi: 'Edi') -> None:
+    def __init__(self, edi: Edi) -> None:
         self.edi = edi
 
     def __str__(self) -> str:
