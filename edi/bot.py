@@ -1,73 +1,64 @@
 # Copyright 2017 John Reese
 # Licensed under the MIT license
 
-import websockets
+import asyncio
+import signal
+
+try:
+    import uvloop
+except ImportError:
+    uvloop = None
 
 from argparse import ArgumentParser
 from os import path
 from typing import List
 
-from tasky import Tasky, Task
-
 from .config import Config
 from .log import Log, init_logger
-from .slack import slacker
 
 
-class Edi(Task):
+class Edi:
+    """Main event framework for the bot."""
 
     def __init__(self, config: Config) -> None:
-        super().__init__()
-
         self.config = config
         self.slack = None
         self.conn = None
+        self.loop = None
 
         Log.debug('Edi ready')
 
-    async def connect(self) -> None:
-        self.slack = slacker.Slacker(self.config.token)
+    def start(self) -> None:
+        """Start the asyncio event loop, and close it when we're done."""
+        if uvloop and self.config.uvloop:
+            Log.debug('Using uvloop')
+            asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
-        rtm_response = self.slack.rtm.start()
-        if rtm_response.error:
-            Log.error('Error requesting RTM connection: %s',
-                      rtm_response.error)
-            return False
+        self.loop = asyncio.new_event_loop()
 
-        Log.info('Connecting to websocket URL %s', rtm_response.url)
-        self.conn = await websockets.connect(rtm_response.url)
-        Log.info(self.conn)
+        if self.config.debug:
+            self.loop.set_debug(True)
 
-        return rtm_response
+        self.loop.add_signal_handler(signal.SIGINT, self.sigterm)
+        self.loop.add_signal_handler(signal.SIGTERM, self.sigterm)
+
+        asyncio.ensure_future(self.run(), loop=self.loop)
+        self.loop.run_forever()
+        self.loop.close()
+
+    def sigterm(self) -> None:
+        """Handle Ctrl-C or SIGTERM by stopping the event loop nicely."""
+        Log.warning('Signal received, stopping execution')
+        asyncio.ensure_future(self.stop(), loop=self.loop)
 
     async def run(self) -> None:
-        response = await self.connect()
-
-        if not response:
-            Log.error('Connection failed, stopping Edi')
-            return
-
-        while self.running and not self.task.cancelled():
-            try:
-                msg = await self.conn.recv()
-                Log.info(msg)
-
-            except websockets.ConnectionClosed:
-                Log.info('Connection closed')
-                break
-
-            except:
-                Log.exception('Exception from RTM')
-                break
-
+        """Execute all the bits of Edi."""
+        Log.info('Hello!')
         Log.info('Goodbye!')
 
     async def stop(self) -> None:
-        if self.conn:
-            Log.debug('closing RTM connection')
-            await self.conn.close()
-
-        await super().stop()
+        """Stop all the bits of Edi."""
+        self.loop.stop()
 
 
 def init_from_config(config: Config) -> Edi:
@@ -76,9 +67,7 @@ def init_from_config(config: Config) -> Edi:
     init_logger(stdout=True, file_path=config.log, debug=config.debug)
     Log.debug('logger initialized')
 
-    tasky = Tasky()
-    tasky.insert(Edi(config))
-    return tasky.run_until_complete()
+    return Edi(config).start()
 
 
 def init_from_cli(argv: List[str]=None) -> Edi:

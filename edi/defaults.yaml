@@ -1,3 +1,4 @@
 token: changeme
 debug: false
 log: ""
+uvloop: true

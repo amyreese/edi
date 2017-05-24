@@ -26,4 +26,5 @@ def slacker_ent_response(raw):
 
     return response
 
+
 slacker.Response = slacker_ent_response
