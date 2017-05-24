@@ -11,9 +11,10 @@ upload: README
 	python3 setup.py sdist upload
 
 lint:
+	-mypy --ignore-missing-imports .
 	python3 -m flake8 --show-source .
 
-test:
+test: lint
 	python3 -m unittest tests
 
 clean:
