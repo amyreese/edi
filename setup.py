@@ -20,6 +20,7 @@ setup(
     ],
     license='MIT License',
     install_requires=[
+        'aiosqlite',
         'ent',
     ],
     packages=['edi'],
