@@ -4,6 +4,6 @@
 
 '''Simple and elegant Slack bot.'''
 
-from .bot import init_from_cli
+from .bot import Edi, init_from_cli
 
 __version__ = '0.1.0'

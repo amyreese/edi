@@ -10,6 +10,7 @@ except ImportError:
     uvloop = None
 
 from argparse import ArgumentParser
+from ent import Singleton
 from os import path
 from typing import Any, List
 
@@ -17,19 +18,22 @@ from .config import Config
 from .log import Log, init_logger
 
 
-class Edi:
+class Edi(metaclass=Singleton):
     """Main event framework for the bot."""
 
     def __init__(self, config: Config) -> None:
-        self.config = config
-        self.slack = None
-        self.conn = None
-        self.loop: asyncio.AbstractEventLoop = None
+        Edi.config = config
+        Edi.loop: asyncio.AbstractEventLoop = None
+
+        self._started = False
 
         Log.debug('Edi ready')
 
     def start(self) -> None:
         """Start the asyncio event loop, and close it when we're done."""
+        if self._started:
+            raise Exception('Edi already started')
+
         if uvloop and self.config.uvloop:
             Log.debug('Using uvloop')
             asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())

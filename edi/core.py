@@ -2,7 +2,6 @@
 # Licensed under the MIT license
 
 from ent import Ent
-from .edi import Edi
 from .log import Log
 
 
@@ -13,9 +12,6 @@ class Message(Ent):
 
 class Unit:
     ENABLED = True
-
-    def __init__(self, edi: Edi) -> None:
-        self.edi = edi
 
     def __str__(self) -> str:
         return self.__class__.__name__
@@ -50,6 +46,13 @@ class Unit:
         dependence on another source of events.
         """
         Log.debug('unit %s ready', self)
+
+    async def stop(self) -> None:
+        """Signal that any async work should be stopped.
+
+        This will be called by the main Edi framework when the service needs
+        to exit.  Units should keep track of """
+        pass
 
     async def dispatch(self, message: Message) -> None:
         """Entry point for events received from the Slack RTM API.
