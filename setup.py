@@ -8,9 +8,9 @@ with open("README.md") as f:
 with open("requirements.txt") as f:
     requires = [line.strip() for line in f if line]
 
-with open('edi/__init__.py') as f:
+with open("edi/__init__.py") as f:
     for line in f:
-        if line.startswith('__version__'):
+        if line.startswith("__version__"):
             version = line.split('"')[1]
 
 setup(
