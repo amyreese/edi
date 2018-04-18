@@ -45,7 +45,7 @@ class Unit:
         ongoing processing will require implementation of a run loop or
         dependence on another source of events.
         """
-        Log.debug('unit %s ready', self)
+        Log.debug("unit %s ready", self)
 
     async def stop(self) -> None:
         """Signal that any async work should be stopped.
@@ -62,6 +62,6 @@ class Unit:
         method for the given message type, and will call that if found.
         """
 
-        method = getattr(self, f'on_{message.type}', None)
+        method = getattr(self, f"on_{message.type}", None)
         if method is not None:
             await method(message)

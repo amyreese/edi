@@ -27,15 +27,15 @@ class Edi(metaclass=Singleton):
 
         self._started = False
 
-        Log.debug('Edi ready')
+        Log.debug("Edi ready")
 
     def start(self) -> None:
         """Start the asyncio event loop, and close it when we're done."""
         if self._started:
-            raise Exception('Edi already started')
+            raise Exception("Edi already started")
 
         if uvloop and self.config.uvloop:
-            Log.debug('Using uvloop')
+            Log.debug("Using uvloop")
             asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
         self.loop = asyncio.new_event_loop()
@@ -52,13 +52,13 @@ class Edi(metaclass=Singleton):
 
     def sigterm(self) -> None:
         """Handle Ctrl-C or SIGTERM by stopping the event loop nicely."""
-        Log.warning('Signal received, stopping execution')
+        Log.warning("Signal received, stopping execution")
         asyncio.ensure_future(self.stop(), loop=self.loop)
 
     async def run(self) -> None:
         """Execute all the bits of Edi."""
-        Log.info('Hello!')
-        Log.info('Goodbye!')
+        Log.info("Hello!")
+        Log.info("Goodbye!")
 
     async def stop(self) -> None:
         """Stop all the bits of Edi."""
@@ -66,17 +66,17 @@ class Edi(metaclass=Singleton):
 
 
 def init_from_config(config: Config) -> None:
-    '''Initialize Edi from a loaded `Config` object.'''
+    """Initialize Edi from a loaded `Config` object."""
 
     init_logger(stdout=True, file_path=config.log, debug=config.debug)
-    Log.debug('logger initialized')
+    Log.debug("logger initialized")
 
     Edi(config).start()
 
 
-def init_from_cli(argv: List[str]=None) -> None:
-    '''Initialize Edi from the CLI, using sys.argv (default) or an optional
-    list of arguments.'''
+def init_from_cli(argv: List[str] = None) -> None:
+    """Initialize Edi from the CLI, using sys.argv (default) or an optional
+    list of arguments."""
 
     options = parse_args(argv)
     config = Config.load_from_file(options.config)
@@ -90,29 +90,43 @@ def init_from_cli(argv: List[str]=None) -> None:
     return init_from_config(config)
 
 
-def parse_args(argv: List[str]=None) -> Any:
-    '''Parse and perform basic validation of CLI options.'''
+def parse_args(argv: List[str] = None) -> Any:
+    """Parse and perform basic validation of CLI options."""
 
-    parser = ArgumentParser(description='simple Slack bot')
-    parser.add_argument('-D', '--debug', action='store_true', default=False,
-                        help='enable debug/verbose output')
-    parser.add_argument('--config', type=str, default='config.yaml',
-                        metavar='PATH',
-                        help='path to configuration file if not in cwd')
-    parser.add_argument('--log', type=str, default=None, metavar='PATH',
-                        help='path to log program output')
+    parser = ArgumentParser(description="simple Slack bot")
+    parser.add_argument(
+        "-D",
+        "--debug",
+        action="store_true",
+        default=False,
+        help="enable debug/verbose output",
+    )
+    parser.add_argument(
+        "--config",
+        type=str,
+        default="config.yaml",
+        metavar="PATH",
+        help="path to configuration file if not in cwd",
+    )
+    parser.add_argument(
+        "--log",
+        type=str,
+        default=None,
+        metavar="PATH",
+        help="path to log program output",
+    )
 
     options: Any = parser.parse_args(argv)
 
     if path.isdir(options.config):
-        options.config = path.join(options.config, 'config.yaml')
+        options.config = path.join(options.config, "config.yaml")
 
     if not path.isfile(options.config):
         parser.error('config path "%s" does not exist' % (options.config,))
 
     if options.log:
         try:
-            with open(options.log, 'a'):
+            with open(options.log, "a"):
                 pass
         except:
             parser.error('log path "%s" invalid' % (options.log,))

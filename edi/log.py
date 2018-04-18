@@ -6,28 +6,31 @@ import sys
 
 from logging import Formatter, StreamHandler, FileHandler
 
-Log = logging.getLogger('edi')
+Log = logging.getLogger("edi")
 
 
-def init_logger(stdout: bool=True, file_path: str=None,
-                debug: bool=False) -> logging.Logger:
-    '''Initialize the logging system for stdout and an optional log file.'''
+def init_logger(
+    stdout: bool = True, file_path: str = None, debug: bool = False
+) -> logging.Logger:
+    """Initialize the logging system for stdout and an optional log file."""
 
-    log = logging.getLogger('')
+    log = logging.getLogger("")
 
     level = logging.DEBUG if debug else logging.INFO
     log.setLevel(level)
 
-    logging.addLevelName(logging.ERROR, 'E')
-    logging.addLevelName(logging.WARNING, 'W')
-    logging.addLevelName(logging.INFO, 'I')
-    logging.addLevelName(logging.DEBUG, 'V')
+    logging.addLevelName(logging.ERROR, "E")
+    logging.addLevelName(logging.WARNING, "W")
+    logging.addLevelName(logging.INFO, "I")
+    logging.addLevelName(logging.DEBUG, "V")
 
-    date_fmt = r'%H:%M:%S'
-    stdout_fmt = ('%(levelname)s: %(message)s')
-    verbose_fmt = ('%(asctime)s,%(msecs)d %(levelname)s '
-                   '%(module)s:%(funcName)s():%(lineno)d   '
-                   '%(message)s')
+    date_fmt = r"%H:%M:%S"
+    stdout_fmt = ("%(levelname)s: %(message)s")
+    verbose_fmt = (
+        "%(asctime)s,%(msecs)d %(levelname)s "
+        "%(module)s:%(funcName)s():%(lineno)d   "
+        "%(message)s"
+    )
 
     handler: logging.Handler
 

@@ -8,5 +8,6 @@ from .core import Unit
 
 
 class EdiDb:
+
     def __init__(self) -> None:
         pass

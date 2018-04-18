@@ -3,6 +3,4 @@
 
 from .chatlog import ChatLog
 
-__all__ = [
-    'ChatLog',
-]
+__all__ = ["ChatLog"]
