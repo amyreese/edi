@@ -1,8 +1,11 @@
 # Copyright 2016 John Reese
 # Licensed under the MIT license
 
+import logging
+
 from ent import Ent
-from .log import Log
+
+log = logging.getLogger(__name__)
 
 
 class Message(Ent):
@@ -45,7 +48,7 @@ class Unit:
         ongoing processing will require implementation of a run loop or
         dependence on another source of events.
         """
-        Log.debug("unit %s ready", self)
+        log.debug("unit %s ready", self)
 
     async def stop(self) -> None:
         """Signal that any async work should be stopped.

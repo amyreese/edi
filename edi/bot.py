@@ -2,6 +2,7 @@
 # Licensed under the MIT license
 
 import asyncio
+import logging
 import signal
 
 try:
@@ -15,7 +16,9 @@ from os import path
 from typing import Any, List
 
 from .config import Config
-from .log import Log, init_logger
+from .log import init_logger
+
+log = logging.getLogger(__name__)
 
 
 class Edi(metaclass=Singleton):
@@ -27,7 +30,7 @@ class Edi(metaclass=Singleton):
 
         self._started = False
 
-        Log.debug("Edi ready")
+        log.debug("Edi ready")
 
     def start(self) -> None:
         """Start the asyncio event loop, and close it when we're done."""
@@ -35,7 +38,7 @@ class Edi(metaclass=Singleton):
             raise Exception("Edi already started")
 
         if uvloop and self.config.uvloop:
-            Log.debug("Using uvloop")
+            log.debug("Using uvloop")
             asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
         self.loop = asyncio.new_event_loop()
@@ -52,13 +55,13 @@ class Edi(metaclass=Singleton):
 
     def sigterm(self) -> None:
         """Handle Ctrl-C or SIGTERM by stopping the event loop nicely."""
-        Log.warning("Signal received, stopping execution")
+        log.warning("Signal received, stopping execution")
         asyncio.ensure_future(self.stop(), loop=self.loop)
 
     async def run(self) -> None:
         """Execute all the bits of Edi."""
-        Log.info("Hello!")
-        Log.info("Goodbye!")
+        log.info("Hello!")
+        log.info("Goodbye!")
 
     async def stop(self) -> None:
         """Stop all the bits of Edi."""
@@ -69,7 +72,7 @@ def init_from_config(config: Config) -> None:
     """Initialize Edi from a loaded `Config` object."""
 
     init_logger(stdout=True, file_path=config.log, debug=config.debug)
-    Log.debug("logger initialized")
+    log.debug("logger initialized")
 
     Edi(config).start()
 

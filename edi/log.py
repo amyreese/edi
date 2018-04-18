@@ -4,8 +4,6 @@
 import logging
 import sys
 
-Log = logging.getLogger("edi")
-
 
 def init_logger(
     stdout: bool = True, file_path: str = None, debug: bool = False
