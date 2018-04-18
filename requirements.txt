@@ -1,2 +1,5 @@
+aiodns
+aiohttp
 aiosqlite
+cchardet
 ent
