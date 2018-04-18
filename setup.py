@@ -8,12 +8,17 @@ with open("README.md") as f:
 with open("requirements.txt") as f:
     requires = [line.strip() for line in f if line]
 
+with open('edi/__init__.py') as f:
+    for line in f:
+        if line.startswith('__version__'):
+            version = line.split('"')[1]
+
 setup(
     name="edi",
     description="Simple and elegant Slack bot",
     long_description=readme,
     long_description_content_type="text/markdown",
-    version=edi.__version__,
+    version=version,
     author="John Reese",
     author_email="john@noswap.com",
     url="https://github.com/jreese/edi",
