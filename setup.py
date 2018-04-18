@@ -5,6 +5,9 @@ import edi
 with open("README.md") as f:
     readme = f.read()
 
+with open("requirements.txt") as f:
+    requires = [line.strip() for line in f if line]
+
 setup(
     name="edi",
     description="Simple and elegant Slack bot",
@@ -25,7 +28,7 @@ setup(
     ],
     license="MIT License",
     setup_requires=["setuptools>=38.6.0"],
-    install_requires=["aiosqlite", "ent"],
+    install_requires=requires,
     packages=["edi"],
     package_data={"edi": ["defaults.yaml"]},
     scripts=["bin/edi"],
