@@ -1,18 +1,21 @@
-README:
-	cp README.rst README
-
-build:
-	python3 setup.py build
+setup:
+	python3 -m pip install -U black mypy pylint twine
+	python3 -m pip install -Ur requirements.txt
 
 dev:
 	python3 setup.py develop
 
-upload: README
-	python3 setup.py sdist upload
+release: README
+	python3 setup.py sdist
+	python3 -m twine upload dist/*
+
+black:
+	python3 -m black .
 
 lint:
-	mypy --ignore-missing-imports .
-	python3 -m flake8 --show-source .
+	python3 -m black --check .
+	python3 -m pylint --rcfile .pylint edi tests
+	python3 -m mypy --ignore-missing-imports --python-version 3.6 .
 
 test: lint
 	python3 -m unittest tests
