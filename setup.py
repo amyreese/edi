@@ -14,7 +14,7 @@ with open("edi/__init__.py") as f:
             version = line.split('"')[1]
 
 setup(
-    name="edi",
+    name="edi-slack",
     description="Simple and elegant Slack bot",
     long_description=readme,
     long_description_content_type="text/markdown",

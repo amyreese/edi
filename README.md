@@ -4,8 +4,8 @@ Edi
 Simple and elegant Slack bot.
 
 [![build status](https://travis-ci.org/jreese/edi.svg?branch=master)](https://travis-ci.org/jreese/edi)
-[![version](https://img.shields.io/pypi/v/edi.svg)](https://pypi.org/project/edi)
-[![license](https://img.shields.io/pypi/l/edi.svg)](https://github.com/jreese/edi/blob/master/LICENSE)
+[![version](https://img.shields.io/pypi/v/edi-slack.svg)](https://pypi.org/project/edi-slack)
+[![license](https://img.shields.io/pypi/l/edi-slack.svg)](https://github.com/jreese/edi/blob/master/LICENSE)
 [![code style](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/ambv/black)
 
 
