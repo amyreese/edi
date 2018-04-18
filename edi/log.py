@@ -4,8 +4,6 @@
 import logging
 import sys
 
-from logging import Formatter, StreamHandler, FileHandler
-
 Log = logging.getLogger("edi")
 
 
@@ -35,20 +33,20 @@ def init_logger(
     handler: logging.Handler
 
     if stdout:
-        handler = StreamHandler(sys.stdout)
+        handler = logging.StreamHandler(sys.stdout)
         handler.setLevel(level)
 
         if debug:
-            handler.setFormatter(Formatter(verbose_fmt, date_fmt))
+            handler.setFormatter(logging.Formatter(verbose_fmt, date_fmt))
         else:
-            handler.setFormatter(Formatter(stdout_fmt, date_fmt))
+            handler.setFormatter(logging.Formatter(stdout_fmt, date_fmt))
 
         log.addHandler(handler)
 
     if file_path:
-        handler = FileHandler(file_path)
+        handler = logging.FileHandler(file_path)
         handler.setLevel(logging.DEBUG)
-        handler.setFormatter(Formatter(verbose_fmt, date_fmt))
+        handler.setFormatter(logging.Formatter(verbose_fmt, date_fmt))
 
         log.addHandler(handler)
 

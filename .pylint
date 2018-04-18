@@ -130,7 +130,9 @@ disable=print-statement,
         bad-continuation,
         missing-docstring,
         invalid-name,
-        protected-access
+        protected-access,
+        too-few-public-methods,
+        wrong-import-order
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option

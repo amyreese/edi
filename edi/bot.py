@@ -22,8 +22,8 @@ class Edi(metaclass=Singleton):
     """Main event framework for the bot."""
 
     def __init__(self, config: Config) -> None:
-        Edi.config = config
-        Edi.loop: asyncio.AbstractEventLoop = None
+        self.config = config
+        self.loop: asyncio.AbstractEventLoop = None
 
         self._started = False
 
@@ -128,7 +128,7 @@ def parse_args(argv: List[str] = None) -> Any:
         try:
             with open(options.log, "a"):
                 pass
-        except:
+        except OSError:
             parser.error('log path "%s" invalid' % (options.log,))
 
     return options

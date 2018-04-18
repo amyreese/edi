@@ -7,5 +7,5 @@ from ..log import Log
 
 class ChatLog(Unit):
 
-    async def on_hello(self, message: Message) -> None:
+    async def on_hello(self, _message: Message) -> None:
         Log.info("Hello, Slack!")
