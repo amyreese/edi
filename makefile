@@ -5,7 +5,7 @@ setup:
 dev:
 	python3 setup.py develop
 
-release: README
+release:
 	python3 setup.py sdist
 	python3 -m twine upload dist/*
 
