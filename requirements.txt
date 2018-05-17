@@ -1,5 +1,8 @@
 aiodns
 aiohttp
 aiosqlite
+appdirs
+attrs
 cchardet
+click
 ent
