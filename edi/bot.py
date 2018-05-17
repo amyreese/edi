@@ -24,9 +24,10 @@ log = logging.getLogger(__name__)
 class Edi(metaclass=Singleton):
     """Main event framework for the bot."""
 
+    loop: asyncio.AbstractEventLoop
+
     def __init__(self, config: Config) -> None:
         self.config = config
-        self.loop: asyncio.AbstractEventLoop = None
 
         self._started = False
 
