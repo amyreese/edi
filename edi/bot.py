@@ -2,6 +2,7 @@
 # Licensed under the MIT license
 
 import asyncio
+import click
 import logging
 import signal
 
@@ -78,9 +79,15 @@ def init_from_config(config: Config) -> None:
     Edi(config).start()
 
 
-def init_from_cli(argv: List[str] = None) -> None:
-    """Initialize Edi from the CLI, using sys.argv (default) or an optional
-    list of arguments."""
+@click.command("edi")
+@click.option("--debug", "-D", is_flag=True, help="enable debug/verbose output")
+@click.option("--config", default=None, type=click.Path(exists=True, resolve_path=True), help="path to configuration file")
+@click.option("--log", default=None, type=click.Path(exists=True, resolve_path=True, dir_okay=False, writable=True), help="path to log program output")
+def init_from_cli(debug: bool, config: str, log: str) -> None:
+    """Simple Slack Bot"""
+
+    print(f"{debug}, {config}, {log}")
+    return
 
     options = parse_args(argv)
     config = Config.load_from_file(options.config)
@@ -136,3 +143,7 @@ def parse_args(argv: List[str] = None) -> Any:
             parser.error('log path "%s" invalid' % (options.log,))
 
     return options
+
+
+if __name__ == "__main__":
+    init_from_cli()
