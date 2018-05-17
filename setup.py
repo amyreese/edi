@@ -1,7 +1,5 @@
 from setuptools import setup
 
-import edi
-
 with open("README.md") as f:
     readme = f.read()
 
