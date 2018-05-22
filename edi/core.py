@@ -3,15 +3,17 @@
 
 import logging
 
-from ent import Ent
+from attr import dataclass
 from typing import Set, Type
 
 log = logging.getLogger(__name__)
 
 
-class Message(Ent):
+@dataclass
+class Message:
     """Base class for all Slack RTM messages."""
-    pass
+
+    type: str
 
 
 class Unit:
