@@ -13,8 +13,9 @@ log = logging.getLogger(__name__)
 
 
 def import_units() -> List[ModuleType]:
+    """Find and import units in this path."""
     modules: List[ModuleType] = []
-    root = Path(__file__).parent
+    root = Path(Path(__file__).parent)  # appease mypy, Path.parents -> PurePath
     log.debug(f"Searching for units in {root}...")
     for path in root.glob("*.py"):
         name = path.stem
