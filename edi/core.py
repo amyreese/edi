@@ -42,7 +42,8 @@ class Unit:
         return seen
 
     async def run(self) -> None:
-        """The main entry point for units to run background tasks.
+        """
+        The main entry point for units to run background tasks.
 
         This will only be called once by the main Edi framework, so any
         ongoing processing will require implementation of a run loop or
@@ -51,20 +52,26 @@ class Unit:
         log.debug("unit %s ready", self)
 
     async def stop(self) -> None:
-        """Signal that any async work should be stopped.
+        """
+        Signal that any async work should be stopped.
 
         This will be called by the main Edi framework when the service needs
-        to exit.  Units should keep track of """
+        to exit.  Units should keep track of any async tasks currently pending
+        and cancel them here."""
         pass
 
     async def dispatch(self, message: Message) -> None:
-        """Entry point for events received from the Slack RTM API.
+        """
+        Entry point for events received from the Slack RTM API.
 
         Any messages from the RTM API will be sent here, to be dispatched
         appropriately.  Default behavior is to look for a matching "on_event"
         method for the given message type, and will call that if found.
         """
 
-        method = getattr(self, f"on_{message.type}", None)
-        if method is not None:
-            await method(message)
+        method = getattr(self, f"on_{message.type}", self.on_default)
+        await method(message)
+
+    async def on_default(self, message: Message) -> None:
+        """Default message handler when specific handlers aren't defined."""
+        pass
