@@ -16,6 +16,7 @@ from typing import List
 from .config import Config
 from .core import Unit
 from .log import init_logger
+from .units import import_units
 
 log = logging.getLogger(__name__)
 
@@ -63,6 +64,7 @@ class Edi(metaclass=Singleton):
         """Execute all the bits of Edi."""
         log.info("Hello!")
 
+        import_units()
         self.units = [unit() for unit in Unit.all_units()]
         log.debug(f"Starting {len(self.units)} units")
         await asyncio.gather(*[unit.start() for unit in self.units])
