@@ -17,7 +17,7 @@ lint:
 	python3 -m pylint --rcfile .pylint edi tests
 	python3 -m mypy --ignore-missing-imports --python-version 3.6 .
 
-test: lint
+test:
 	python3 -m unittest tests
 
 clean:
