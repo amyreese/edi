@@ -11,7 +11,7 @@ from .config import Config
 @click.option("--debug", "-D", is_flag=True, help="enable debug/verbose output")
 @click.option(
     "--config",
-    default="config.yaml",
+    default=None,
     type=click.Path(exists=True, dir_okay=False, resolve_path=True),
     help="path to configuration file",
 )
@@ -34,17 +34,17 @@ def init_from_cli(
         return
 
     if config is not None:
-        config = Config.load_from_file(config)
+        cfg = Config.load_from_file(config)
     else:
-        config = Config.load_defaults()
+        cfg = Config.load_defaults()
 
     if log is not None:
-        config.log = log
+        cfg.log = log
 
     if debug:
-        config.debug = True
+        cfg.debug = True
 
-    init_from_config(config)
+    init_from_config(cfg)
 
 
 if __name__ == "__main__":

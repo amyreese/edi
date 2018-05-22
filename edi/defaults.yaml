@@ -1,5 +1,0 @@
-token: changeme
-db_path: edi.db
-debug: false
-log: ""
-uvloop: true
