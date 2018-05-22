@@ -21,7 +21,7 @@ def init_logger(
     logging.addLevelName(logging.DEBUG, "V")
 
     date_fmt = r"%H:%M:%S"
-    stdout_fmt = ("%(levelname)s: %(message)s")
+    stdout_fmt = "%(levelname)s: %(message)s"
     verbose_fmt = (
         "%(asctime)s,%(msecs)d %(levelname)s "
         "%(module)s:%(funcName)s():%(lineno)d   "

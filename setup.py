@@ -34,5 +34,5 @@ setup(
     install_requires=requires,
     packages=["edi"],
     package_data={"edi": ["defaults.yaml"]},
-    scripts=["bin/edi"],
+    entry_points={"console_scripts": ["edi = edi.__main__:init_from_cli"]},
 )

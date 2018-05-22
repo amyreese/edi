@@ -1,8 +1,0 @@
-#!/usr/bin/env python3
-
-# Copyright 2016 John Reese
-# Licensed under the MIT license
-
-import edi
-
-edi.init_from_cli()

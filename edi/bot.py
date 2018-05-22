@@ -2,7 +2,6 @@
 # Licensed under the MIT license
 
 import asyncio
-import click
 import logging
 import signal
 
@@ -11,10 +10,7 @@ try:
 except ImportError:
     uvloop = None
 
-from argparse import ArgumentParser
 from ent import Singleton
-from os import path
-from typing import Any, List
 
 from .config import Config
 from .log import init_logger
@@ -77,73 +73,3 @@ def init_from_config(config: Config) -> None:
     log.debug("logger initialized")
 
     Edi(config).start()
-
-
-@click.command("edi")
-@click.option("--debug", "-D", is_flag=True, help="enable debug/verbose output")
-@click.option("--config", default=None, type=click.Path(exists=True, resolve_path=True), help="path to configuration file")
-@click.option("--log", default=None, type=click.Path(exists=True, resolve_path=True, dir_okay=False, writable=True), help="path to log program output")
-def init_from_cli(debug: bool, config: str, log: str) -> None:
-    """Simple Slack Bot"""
-
-    print(f"{debug}, {config}, {log}")
-    return
-
-    options = parse_args(argv)
-    config = Config.load_from_file(options.config)
-
-    if options.log:
-        config.log = options.log
-
-    if options.debug:
-        config.debug = options.debug
-
-    return init_from_config(config)
-
-
-def parse_args(argv: List[str] = None) -> Any:
-    """Parse and perform basic validation of CLI options."""
-
-    parser = ArgumentParser(description="simple Slack bot")
-    parser.add_argument(
-        "-D",
-        "--debug",
-        action="store_true",
-        default=False,
-        help="enable debug/verbose output",
-    )
-    parser.add_argument(
-        "--config",
-        type=str,
-        default="config.yaml",
-        metavar="PATH",
-        help="path to configuration file if not in cwd",
-    )
-    parser.add_argument(
-        "--log",
-        type=str,
-        default=None,
-        metavar="PATH",
-        help="path to log program output",
-    )
-
-    options: Any = parser.parse_args(argv)
-
-    if path.isdir(options.config):
-        options.config = path.join(options.config, "config.yaml")
-
-    if not path.isfile(options.config):
-        parser.error('config path "%s" does not exist' % (options.config,))
-
-    if options.log:
-        try:
-            with open(options.log, "a"):
-                pass
-        except OSError:
-            parser.error('log path "%s" invalid' % (options.log,))
-
-    return options
-
-
-if __name__ == "__main__":
-    init_from_cli()
