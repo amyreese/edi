@@ -11,8 +11,10 @@ except ImportError:
     uvloop = None
 
 from ent import Singleton
+from typing import List
 
 from .config import Config
+from .core import Unit
 from .log import init_logger
 
 log = logging.getLogger(__name__)
@@ -25,6 +27,7 @@ class Edi(metaclass=Singleton):
 
     def __init__(self, config: Config) -> None:
         self.config = config
+        self.units: List[Unit] = []
 
         self._started = False
 
@@ -59,11 +62,18 @@ class Edi(metaclass=Singleton):
     async def run(self) -> None:
         """Execute all the bits of Edi."""
         log.info("Hello!")
-        log.info("Goodbye!")
+
+        self.units = [unit() for unit in Unit.all_units()]
+        log.debug(f"Starting {len(self.units)} units")
+        await asyncio.gather(*[unit.start() for unit in self.units])
 
     async def stop(self) -> None:
         """Stop all the bits of Edi."""
+        log.debug(f"Stopping {len(self.units)} units")
+        await asyncio.gather(*[unit.stop() for unit in self.units])
+
         self.loop.stop()
+        log.info("Goodbye!")
 
 
 def init_from_config(config: Config) -> None:

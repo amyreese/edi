@@ -4,6 +4,7 @@
 import logging
 
 from ent import Ent
+from typing import Set, Type
 
 log = logging.getLogger(__name__)
 
@@ -20,7 +21,7 @@ class Unit:
         return self.__class__.__name__
 
     @classmethod
-    def all_units(cls, *, enabled_only=True):
+    def all_units(cls, *, enabled_only: bool = True) -> Set[Type["Unit"]]:
         """Return all defined subclasses of Unit, recursively."""
         seen = set()
         queue = set([cls])
@@ -41,7 +42,7 @@ class Unit:
 
         return seen
 
-    async def run(self) -> None:
+    async def start(self) -> None:
         """
         The main entry point for units to run background tasks.
 
@@ -57,7 +58,8 @@ class Unit:
 
         This will be called by the main Edi framework when the service needs
         to exit.  Units should keep track of any async tasks currently pending
-        and cancel them here."""
+        and cancel them here.  Edi assumes this unit is completely stopped
+        once this coroutine is completed."""
         pass
 
     async def dispatch(self, message: Message) -> None:
