@@ -27,6 +27,7 @@ class Edi(metaclass=Singleton):
     loop: asyncio.AbstractEventLoop
 
     def __init__(self, config: Config) -> None:
+        log.debug(f"initializing with {config}")
         self.config = config
         self.units: List[Unit] = []
 
