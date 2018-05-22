@@ -21,4 +21,4 @@ test:
 	python3 -m unittest tests
 
 clean:
-	rm -rf build dist README MANIFEST edi.egg-info
+	rm -rf build dist README MANIFEST edi_slack.egg-info .mypy_cache
