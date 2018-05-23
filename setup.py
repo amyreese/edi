@@ -33,6 +33,5 @@ setup(
     setup_requires=["setuptools>=38.6.0"],
     install_requires=requires,
     packages=["edi"],
-    package_data={"edi": ["defaults.yaml"]},
     entry_points={"console_scripts": ["edi = edi.__main__:init_from_cli"]},
 )
