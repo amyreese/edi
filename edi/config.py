@@ -23,7 +23,7 @@ class Config:
         return cls()
 
     @classmethod
-    def load_from_file(cls, file_path) -> "Config":
+    def load_from_file(cls, file_path: str) -> "Config":
         """Given a path to a local configuration file, read the config file and
         merge its contents onto the default configuration."""
 

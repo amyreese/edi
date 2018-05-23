@@ -15,7 +15,7 @@ black:
 lint:
 	python3 -m black --check .
 	python3 -m pylint --rcfile .pylint edi tests
-	python3 -m mypy --ignore-missing-imports --python-version 3.6 .
+	python3 -m mypy --python-version 3.6 .
 
 test:
 	python3 -m unittest tests
