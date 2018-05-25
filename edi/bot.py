@@ -10,6 +10,7 @@ try:
 except ImportError:
     uvloop = None
 
+from aioslack import Event, Slack
 from ent import Singleton
 from typing import List
 
@@ -32,8 +33,6 @@ class Edi(metaclass=Singleton):
         self.units: List[Unit] = []
 
         self._started = False
-
-        log.debug("Edi ready")
 
     def start(self) -> None:
         """Start the asyncio event loop, and close it when we're done."""
@@ -63,20 +62,39 @@ class Edi(metaclass=Singleton):
 
     async def run(self) -> None:
         """Execute all the bits of Edi."""
-        log.info("Hello!")
 
-        import_units()
-        self.units = [unit() for unit in Unit.all_units()]
-        log.debug(f"Starting {len(self.units)} units")
-        await asyncio.gather(*[unit.start() for unit in self.units])
+        try:
+            self.slack = Slack(token=self.config.token)
+
+            import_units()
+            self.units = [unit() for unit in Unit.all_units()]
+            log.debug(f"Starting {len(self.units)} units")
+            await asyncio.gather(*[unit.start() for unit in self.units])
+
+            async for event in self.slack.rtm():
+                log.info(f"received RTM event {event}")
+                await self.dispatch(event)
+
+        except Exception:
+            await self.stop()
+            raise
 
     async def stop(self) -> None:
         """Stop all the bits of Edi."""
-        log.debug(f"Stopping {len(self.units)} units")
-        await asyncio.gather(*[unit.stop() for unit in self.units])
 
-        self.loop.stop()
-        log.info("Goodbye!")
+        try:
+            log.debug(f"Stopping {len(self.units)} units")
+            await asyncio.gather(*[unit.stop() for unit in self.units])
+
+            await self.slack.close()
+
+        finally:
+            self.loop.stop()
+            log.info("Goodbye!")
+
+    async def dispatch(self, event: Event) -> None:
+        """Dispatch events to all active units."""
+        await asyncio.gather(*[unit.dispatch(event) for unit in self.units])
 
 
 def init_from_config(config: Config) -> None:
