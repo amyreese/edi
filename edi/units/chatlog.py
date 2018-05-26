@@ -3,7 +3,7 @@
 
 import logging
 
-from aioslack import Event, SlackError
+from aioslack import Event
 from datetime import datetime
 from pathlib import Path
 
@@ -68,20 +68,14 @@ class ChatLog(Unit):
         dt = datetime.fromtimestamp(ts)
         channel = event.item["channel"]
         history = await self.slack.api(
-            "channels.history",
-            channel=channel,
-            latest=ts,
-            oldest=ts,
-            inclusive=True,
+            "channels.history", channel=channel, latest=ts, oldest=ts, inclusive=True
         )
         context = Event.generate(history.messages[0])
         channel = self.slack.channels[channel].name
         username = self.slack.users[context.user].name
         text = context.text
         if len(text) > 40:
-            text = text[:40].rsplit(' ', 1)[0] + "..."
-        message = (
-            f" * {username} reacted :{event.reaction}: to <{username}> {text}"
-        )
+            text = text[:40].rsplit(" ", 1)[0] + "..."
+        message = f" * {username} reacted :{event.reaction}: to <{username}> {text}"
 
         self.log_message(channel, dt, message)
