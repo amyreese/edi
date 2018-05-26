@@ -16,7 +16,7 @@ class ChatLog(Unit):
 
     async def start(self) -> None:
         self.root = Path.home() / "slack" / "logs"
-        self.root.mkdirs(parents=True, exist_ok=True)
+        self.root.mkdir(parents=True, exist_ok=True)
 
     def log_message(self, channel: str, dt: datetime, message: str) -> None:
         date = dt.strftime(r"%Y-%m-%d")
