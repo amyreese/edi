@@ -32,6 +32,6 @@ setup(
     license="MIT License",
     setup_requires=["setuptools>=38.6.0"],
     install_requires=requires,
-    packages=["edi"],
+    packages=["edi", "edi.units"],
     entry_points={"console_scripts": ["edi = edi.__main__:init_from_cli"]},
 )
