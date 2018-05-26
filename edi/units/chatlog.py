@@ -73,10 +73,11 @@ class ChatLog(Unit):
         )
         context = Event.generate(history.messages[0])
         channel = self.slack.channels[channel].name
+        reactor = self.slack.users[event.user].name
         username = self.slack.users[context.user].name
         text = context.text
         if len(text) > 40:
             text = text[:40].rsplit(" ", 1)[0] + "..."
-        message = f" * {username} reacted :{event.reaction}: to <{username}> {text}"
+        message = f" * {reactor} reacted :{event.reaction}: to <{username}> {text}"
 
         self.log_message(channel, dt, message)
