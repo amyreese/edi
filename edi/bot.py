@@ -67,15 +67,16 @@ class Edi(metaclass=Singleton):
             self.slack = Slack(token=self.config.token)
 
             import_units()
-            self.units = [unit() for unit in Unit.all_units()]
+            self.units = [unit(self.slack) for unit in Unit.all_units()]
             log.debug(f"Starting {len(self.units)} units")
             await asyncio.gather(*[unit.start() for unit in self.units])
 
+            log.debug(f"Starting RTM loop")
             async for event in self.slack.rtm():
-                log.info(f"received RTM event {event}")
                 await self.dispatch(event)
 
         except Exception:
+            log.exception(f"run loop exception, stopping")
             await self.stop()
             raise
 
@@ -84,7 +85,9 @@ class Edi(metaclass=Singleton):
 
         try:
             log.debug(f"Stopping {len(self.units)} units")
-            await asyncio.gather(*[unit.stop() for unit in self.units])
+            await asyncio.gather(
+                *[unit.stop() for unit in self.units], return_exceptions=True
+            )
 
             await self.slack.close()
 
@@ -94,7 +97,13 @@ class Edi(metaclass=Singleton):
 
     async def dispatch(self, event: Event) -> None:
         """Dispatch events to all active units."""
-        await asyncio.gather(*[unit.dispatch(event) for unit in self.units])
+        results = await asyncio.gather(
+            *[unit.dispatch(event) for unit in self.units], return_exceptions=True
+        )
+
+        for result in results:
+            if isinstance(result, BaseException):
+                log.error(f"uncaught exception:\n{result}")
 
 
 def init_from_config(config: Config) -> None:

@@ -6,6 +6,8 @@ import logging
 from attr import dataclass
 from typing import Set, Type
 
+from aioslack import Slack
+
 log = logging.getLogger(__name__)
 
 
@@ -18,6 +20,9 @@ class Message:
 
 class Unit:
     ENABLED = True
+
+    def __init__(self, slack: Slack) -> None:
+        self.slack = slack
 
     def __str__(self) -> str:
         return self.__class__.__name__
