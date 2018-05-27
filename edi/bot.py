@@ -12,7 +12,7 @@ except ImportError:
 
 from aioslack import Event, Slack
 from ent import Singleton
-from typing import List
+from typing import Dict, Type
 
 from .config import Config
 from .core import Unit
@@ -27,12 +27,11 @@ class Edi(metaclass=Singleton):
 
     loop: asyncio.AbstractEventLoop
 
-    def __init__(self, config: Config) -> None:
-        log.debug(f"initializing with {config}")
-        self.config = config
-        self.units: List[Unit] = []
-
+    def __init__(self, config: Config = None) -> None:
+        self.config = config or Config()
+        self.units: Dict[Type[Unit], Unit] = {}
         self._started = False
+        log.debug(f"Edi initialized with {config}")
 
     def start(self) -> None:
         """Start the asyncio event loop, and close it when we're done."""
@@ -67,9 +66,9 @@ class Edi(metaclass=Singleton):
             self.slack = Slack(token=self.config.token)
 
             import_units()
-            self.units = [unit(self.slack) for unit in Unit.all_units()]
+            self.units = {unit: unit(self.slack) for unit in Unit.all_units()}
             log.debug(f"Starting {len(self.units)} units")
-            await asyncio.gather(*[unit.start() for unit in self.units])
+            await asyncio.gather(*[unit.start() for unit in self.units.values()])
 
             log.debug(f"Starting RTM loop")
             async for event in self.slack.rtm():
@@ -86,7 +85,7 @@ class Edi(metaclass=Singleton):
         try:
             log.debug(f"Stopping {len(self.units)} units")
             await asyncio.gather(
-                *[unit.stop() for unit in self.units], return_exceptions=True
+                *[unit.stop() for unit in self.units.values()], return_exceptions=True
             )
 
             await self.slack.close()
@@ -98,7 +97,8 @@ class Edi(metaclass=Singleton):
     async def dispatch(self, event: Event) -> None:
         """Dispatch events to all active units."""
         results = await asyncio.gather(
-            *[unit.dispatch(event) for unit in self.units], return_exceptions=True
+            *[unit.dispatch(event) for unit in self.units.values()],
+            return_exceptions=True,
         )
 
         for result in results:
