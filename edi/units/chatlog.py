@@ -7,7 +7,7 @@ from aioslack import Event
 from datetime import datetime
 from pathlib import Path
 
-from ..core import Unit
+from edi import Edi, Unit
 
 log = logging.getLogger(__name__)
 
@@ -15,23 +15,32 @@ log = logging.getLogger(__name__)
 class ChatLog(Unit):
 
     async def start(self) -> None:
-        self.root = Path.home() / "slack" / "logs"
-        self.root.mkdir(parents=True, exist_ok=True)
+        config = Edi().config
+        self.root = Path(config.chatlog_root).expanduser()
+        self.format = config.chatlog_format
 
     def log_message(self, channel: str, dt: datetime, message: str) -> None:
         date = dt.strftime(r"%Y-%m-%d")
         time = dt.strftime(r"%H:%M:%S")
 
+        formatted = self.format.format(
+            date=date,
+            time=time,
+            team=self.slack.team.name,
+            channel=channel,
+            message=message,
+        )
         log.info(f"[{date} {time}] #{channel} {message}")
 
         filename = self.root / channel / f"{date}.log"
         filename.parent.mkdir(parents=True, exist_ok=True)
         with open(filename, "a") as f:
-            f.write(f"[{time}] {message}\n")
+            f.write(formatted + "\n")
 
     async def on_hello(self, event: Event) -> None:
         assert event
         self.root /= self.slack.team.name
+        self.root.mkdir(parents=True, exist_ok=True)
         log.info(f"logging messages to {self.root}")
 
     async def on_message(self, event: Event) -> None:

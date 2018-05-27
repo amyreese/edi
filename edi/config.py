@@ -16,6 +16,9 @@ class Config:
     log: str = ""
     uvloop: bool = True
 
+    chatlog_root: str = "~/slacklogs"
+    chatlog_format: str = "[{time}] {message}"
+
     @classmethod
     def load_defaults(cls) -> "Config":
         """Load the default configuration and return the object."""
@@ -28,7 +31,7 @@ class Config:
         merge its contents onto the default configuration."""
 
         kwargs = {}
-        path = Path(file_path)
+        path = Path(file_path).expanduser()
         if path.exists() and path.is_file():
             with open(path) as fd:
                 contents = json.load(fd)

@@ -4,6 +4,6 @@
 
 """Simple and elegant Slack bot."""
 
-from .bot import Edi
+from .bot import Edi, Unit
 
 __version__ = "0.2.2"
