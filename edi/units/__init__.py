@@ -12,13 +12,20 @@ from typing import List
 log = logging.getLogger(__name__)
 
 
-def import_units() -> List[ModuleType]:
+def import_units(root: Path = None) -> List[ModuleType]:
     """Find and import units in this path."""
     modules: List[ModuleType] = []
-    root = Path(Path(__file__).parent)  # appease mypy, Path.parents -> PurePath
+
+    if root is None:
+        root = Path(__file__)
+    if not root.is_dir():
+        root = Path(root.parent)  # appease mypy, Path.parents -> PurePath
+
     log.debug(f"Searching for units in {root}...")
     for path in root.glob("*.py"):
         name = path.stem
+        if name.startswith("_"):
+            continue
         log.debug(f"Loading unit {name}")
         module = import_module(f"edi.units.{name}")
         modules.append(module)
