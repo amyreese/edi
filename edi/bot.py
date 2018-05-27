@@ -68,7 +68,11 @@ class Edi(metaclass=Singleton):
             import_units()
             self.units = {unit: unit(self.slack) for unit in Unit.all_units()}
             log.debug(f"Starting {len(self.units)} units")
-            await asyncio.gather(*[unit.start() for unit in self.units.values()])
+            for result in await asyncio.gather(
+                *[unit.start() for unit in self.units.values()], return_exceptions=True
+            ):
+                if isinstance(result, BaseException):
+                    log.error(f"uncaught exception:\n{result}")
 
             log.debug(f"Starting RTM loop")
             async for event in self.slack.rtm():
@@ -84,9 +88,11 @@ class Edi(metaclass=Singleton):
 
         try:
             log.debug(f"Stopping {len(self.units)} units")
-            await asyncio.gather(
+            for result in await asyncio.gather(
                 *[unit.stop() for unit in self.units.values()], return_exceptions=True
-            )
+            ):
+                if isinstance(result, BaseException):
+                    log.error(f"uncaught exception:\n{result}")
 
             await self.slack.close()
 
