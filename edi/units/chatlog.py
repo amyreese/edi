@@ -47,12 +47,20 @@ class ChatLog(Unit):
         dt = datetime.fromtimestamp(float(event.ts))
 
         channel = self.slack.channels[event.channel].name
-        username = self.slack.users[event.user].name
+        message = ""
+        if "bot_user" in event:
+            username = event.username
+        elif "user" in event:
+            username = self.slack.users[event.user].name
+        else:
+            username = "unknown"
 
         if "subtype" in event:
             subtype = event.subtype
 
-            if subtype == "me_message":
+            if subtype == "bot_message":
+                message = f"<{username}> {event.text}"
+            elif subtype == "me_message":
                 message = f"* {username} {event.text}"
             elif subtype == "channel_join":
                 message = f"* {username} joined the channel"
@@ -71,7 +79,8 @@ class ChatLog(Unit):
         else:
             message = f"<{username}> {event.text}"
 
-        self.log_message(channel, dt, message)
+        if message:
+            self.log_message(channel, dt, message)
 
     async def on_reaction_added(self, event: Event) -> None:
         ts = float(event.item["ts"])
