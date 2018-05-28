@@ -8,6 +8,7 @@ import time
 from aioslack.types import Auto
 from peony import PeonyClient
 from peony.exceptions import PeonyException
+from typing import Optional
 
 from edi import Edi, Unit
 
@@ -101,6 +102,17 @@ class Twitter(Unit):
                 if wait > 0:
                     log.info(f"sleeping for {wait}s")
                     await asyncio.sleep(wait)
+
+    async def update(self, status: str) -> Optional[Auto]:
+        try:
+            response = await self.client.api.statuses.update.post(
+                status=status, trim_user=True
+            )
+            return Auto.generate(response)
+
+        except PeonyException:
+            log.exception("failed to update status")
+            return None
 
     async def stop(self) -> None:
         self.task.cancel()
