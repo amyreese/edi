@@ -5,16 +5,17 @@ import asyncio
 import logging
 import time
 
-from aioslack.types import Auto
+from aioslack.types import Auto, Channel, User
 from peony import PeonyClient
 from peony.exceptions import PeonyException
 from typing import Optional
 
-from edi import Edi, Unit
+from edi import Edi, Unit, command
 
 log = logging.getLogger(__name__)
 
 
+@command("tweet", description="<status>: twitter a new tweet")
 class Twitter(Unit):
 
     async def start(self) -> None:
@@ -49,7 +50,6 @@ class Twitter(Unit):
             log.info(f"no twitter timeline channels configured")
             return
 
-        await asyncio.sleep(5)
         since_id = None
 
         while True:
@@ -70,21 +70,10 @@ class Twitter(Unit):
                     tweet = Auto.generate(tweets[-1])
 
                     if since_id is not None:
-                        text = (
-                            f":rooster: https://twitter.com/{tweet.user.screen_name}"
-                            f"/status/{tweet.id_str}"
-                        )
                         for name in self.config.twitter_timeline_channels:
                             channel = self.slack.channels.get(name, None)
                             if channel:
-                                log.info(f"posting to #{channel.name}: {text}")
-                                result = await self.slack.api(
-                                    "chat.postMessage",
-                                    channel=channel.id,
-                                    text=text,
-                                    as_user=True,
-                                )
-                                log.info(f"{result}")
+                                await self.announce(channel, tweet)
 
                     since_id = tweet.id_str
 
@@ -103,16 +92,35 @@ class Twitter(Unit):
                     log.info(f"sleeping for {wait}s")
                     await asyncio.sleep(wait)
 
+    @staticmethod
+    def tweet_url(tweet: Auto) -> str:
+        return (
+            f":rooster: https://twitter.com/{tweet.user.screen_name}"
+            f"/status/{tweet.id_str}"
+        )
+
+    async def announce(self, channel: Channel, tweet: Auto) -> None:
+        await self.slack.api(
+            "chat.postMessage",
+            channel=channel.id,
+            text=self.tweet_url(tweet),
+            as_user=True,
+        )
+
     async def update(self, status: str) -> Optional[Auto]:
         try:
-            response = await self.client.api.statuses.update.post(
-                status=status, trim_user=True
-            )
+            response = await self.client.api.statuses.update.post(status=status)
             return Auto.generate(response)
 
         except PeonyException:
             log.exception("failed to update status")
             return None
+
+    async def tweet(self, channel: Channel, user: User, status: str) -> str:
+        tweet = await self.update(status)
+        if tweet is not None:
+            return self.tweet_url(tweet)
+        return r"¯\_(ツ)_/¯"
 
     async def stop(self) -> None:
         self.task.cancel()

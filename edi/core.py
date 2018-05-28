@@ -2,12 +2,34 @@
 # Licensed under the MIT license
 
 import logging
+import re
 
-from typing import Set, Type
+from typing import Callable, Dict, Pattern, Set, Tuple, Type
 
 from aioslack import Slack, Event
 
 log = logging.getLogger(__name__)
+
+COMMANDS: Dict[str, Tuple[Type["Unit"], Pattern, str]] = {}
+
+
+def command(
+    name: str, args: str = r"(.*)", description: str = ""
+) -> Callable[[Type["Unit"]], Type["Unit"]]:
+    """Decorator for automating command/args declaration and dispatch."""
+    name = name.lower()
+
+    def wrapper(cls: Type["Unit"]) -> Type["Unit"]:
+        unit_type = cls
+
+        if name in COMMANDS:
+            unit, _regex, _description = COMMANDS[name]
+            raise ValueError(f'command "{name}" already claimed by {unit.__name__}')
+        COMMANDS[name] = (unit_type, re.compile(args), description)
+
+        return cls
+
+    return wrapper
 
 
 class Unit:

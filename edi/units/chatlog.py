@@ -20,6 +20,8 @@ class ChatLog(Unit):
         self.format = config.chatlog_format
 
     def log_message(self, channel: str, dt: datetime, message: str) -> None:
+        # todo: replace <@U0HML87RT> with @username
+
         date = dt.strftime(r"%Y-%m-%d")
         time = dt.strftime(r"%H:%M:%S")
 

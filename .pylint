@@ -136,7 +136,10 @@ disable=print-statement,
         attribute-defined-outside-init,
         too-many-branches,
         too-many-nested-blocks,
-        broad-except
+        too-many-locals,
+        broad-except,
+        unused-argument,
+        duplicate-code
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
