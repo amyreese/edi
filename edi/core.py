@@ -3,19 +3,11 @@
 
 import logging
 
-from attr import dataclass
 from typing import Set, Type
 
-from aioslack import Slack
+from aioslack import Slack, Event
 
 log = logging.getLogger(__name__)
-
-
-@dataclass
-class Message:
-    """Base class for all Slack RTM messages."""
-
-    type: str
 
 
 class Unit:
@@ -69,7 +61,7 @@ class Unit:
         once this coroutine is completed."""
         pass
 
-    async def dispatch(self, message: Message) -> None:
+    async def dispatch(self, event: Event) -> None:
         """
         Entry point for events received from the Slack RTM API.
 
@@ -78,9 +70,9 @@ class Unit:
         method for the given message type, and will call that if found.
         """
 
-        method = getattr(self, f"on_{message.type}", self.on_default)
-        await method(message)
+        method = getattr(self, f"on_{event.type}", self.on_default)
+        await method(event)
 
-    async def on_default(self, message: Message) -> None:
+    async def on_default(self, event: Event) -> None:
         """Default message handler when specific handlers aren't defined."""
         pass
