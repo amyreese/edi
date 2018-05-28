@@ -13,8 +13,6 @@ from edi import Edi, Unit
 
 log = logging.getLogger(__name__)
 
-CHARS = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890"
-
 
 class Twitter(Unit):
 
