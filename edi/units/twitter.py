@@ -64,31 +64,39 @@ class Twitter(Unit):
                     kwargs["since_id"] = since_id
 
                 tweets = await self.client.api.statuses.home_timeline.get(**kwargs)
-                log.info(f"timeline:")
-                for tweet in reversed(tweets):
-                    log.info(f" @{tweet.user.screen_name}: {tweet.text}")
-                tweet = Auto.generate(tweets[-1])
+                if tweets:
+                    log.info(f"timeline:")
+                    for tweet in reversed(tweets):
+                        log.info(f" @{tweet.user.screen_name}: {tweet.text}")
+                    tweet = Auto.generate(tweets[-1])
 
-                if since_id is not None:
-                    text = (
-                        f":rooster: https://twitter.com/{tweet.user.screen_name}"
-                        f"/status/{tweet.id_str}"
-                    )
-                    for channel in self.slack.channels.values():
-                        if channel.name in self.config.twitter_timeline_channels:
-                            log.info(f"posting to #{channel.name}: {text}")
-                            result = await self.slack.api(
-                                "chat.postMessage",
-                                channel=channel.id,
-                                text=text,
-                                as_user=True,
-                            )
-                            log.info(f"{result}")
+                    if since_id is not None:
+                        text = (
+                            f":rooster: https://twitter.com/{tweet.user.screen_name}"
+                            f"/status/{tweet.id_str}"
+                        )
+                        for name in self.config.twitter_timeline_channels:
+                            channel = self.slack.channels.get(name, None)
+                            if channel:
+                                log.info(f"posting to #{channel.name}: {text}")
+                                result = await self.slack.api(
+                                    "chat.postMessage",
+                                    channel=channel.id,
+                                    text=text,
+                                    as_user=True,
+                                )
+                                log.info(f"{result}")
 
-                since_id = tweet.id_str
+                    since_id = tweet.id_str
+
+                else:
+                    log.info(f"timeline empty")
 
             except PeonyException:
                 log.exception("timeline update failed")
+
+            except Exception:
+                log.exception(r"¯\_(ツ)_/¯")
 
             finally:
                 wait = (ts + 90) - time.time()
