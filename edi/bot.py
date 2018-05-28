@@ -12,7 +12,7 @@ except ImportError:
 
 from aioslack import Event, Slack
 from ent import Singleton
-from typing import Dict, Type
+from typing import Dict, Type, Optional
 
 from .config import Config
 from .core import Unit
@@ -30,6 +30,7 @@ class Edi(metaclass=Singleton):
     def __init__(self, config: Config = None) -> None:
         self.config = config or Config()
         self.units: Dict[Type[Unit], Unit] = {}
+        self.task: Optional[asyncio.Future] = None
         self._started = False
         log.debug(f"Edi initialized with {config}")
 
@@ -50,7 +51,7 @@ class Edi(metaclass=Singleton):
         self.loop.add_signal_handler(signal.SIGINT, self.sigterm)
         self.loop.add_signal_handler(signal.SIGTERM, self.sigterm)
 
-        asyncio.ensure_future(self.run(), loop=self.loop)
+        self.task = asyncio.ensure_future(self.run(), loop=self.loop)
         self.loop.run_forever()
         self.loop.close()
 
@@ -87,6 +88,10 @@ class Edi(metaclass=Singleton):
         """Stop all the bits of Edi."""
 
         try:
+            if self.task is not None:
+                self.task.cancel()
+                self.task = None
+
             log.debug(f"Stopping {len(self.units)} units")
             for result in await asyncio.gather(
                 *[unit.stop() for unit in self.units.values()], return_exceptions=True
