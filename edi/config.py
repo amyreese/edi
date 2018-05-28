@@ -5,6 +5,7 @@ import json
 
 from attr import dataclass, fields_dict
 from pathlib import Path
+from typing import List
 
 
 @dataclass
@@ -18,6 +19,12 @@ class Config:
 
     chatlog_root: str = "~/slacklogs"
     chatlog_format: str = "[{time}] {message}"
+
+    twitter_consumer_key: str = ""
+    twitter_consumer_secret: str = ""
+    twitter_access_key: str = ""
+    twitter_access_secret: str = ""
+    twitter_timeline_channels: List = []
 
     @classmethod
     def load_defaults(cls) -> "Config":

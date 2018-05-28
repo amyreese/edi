@@ -7,3 +7,4 @@ attrs
 cchardet
 click
 ent
+peony-twitter
