@@ -2,6 +2,7 @@
 # Licensed under the MIT license
 
 import logging
+import random
 
 from aioslack import Channel, User
 
@@ -12,6 +13,7 @@ log = logging.getLogger(__name__)
 
 
 @command("help", description="[command]: show command details")
+@command("hello", description=": <insert witty help text here>")
 class Help(Unit):
 
     async def help(self, channel: Channel, user: User, phrase: str) -> str:
@@ -51,3 +53,17 @@ class Help(Unit):
             return ""
 
         return text
+
+    async def hello(self, channel: Channel, user: User, phrase: str) -> str:
+        # http://masseffect.wikia.com/wiki/Legion/Unique_dialogue
+        humor = [
+            "These facilities are inadequate.",
+            "Metal detectors are inconvenient.",
+            "Tactical disadvantage. Recommend orbital fire support.",
+            "This platform is not available for experimentation.",
+            "Your operating system is unstable. You will fail.",
+            "The first thing a god masters is itself.",
+            "Our analysis of organic humour suggests an 87.3% chance "
+            'that you expect us to respond with, "You are only human."',
+        ]
+        return random.choice(humor)
