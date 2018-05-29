@@ -18,7 +18,7 @@ class Config:
     uvloop: bool = True
 
     disable_units: List = []
-    disable_commands: List = ["tweet"]
+    disable_commands: List = []
     ignore_channels: List = []
 
     chatlog_root: str = "~/slacklogs"
