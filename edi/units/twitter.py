@@ -38,9 +38,6 @@ class Twitter(Unit):
             access_token_secret=self.config.twitter_access_secret,
         )
 
-        user = await self.client.user
-        log.info(f"connected to twitter as @{user.screen_name}")
-
         self.task = asyncio.ensure_future(self.timeline())
 
     async def timeline(self) -> None:
@@ -49,6 +46,9 @@ class Twitter(Unit):
         if not self.config.twitter_timeline_channels:
             log.info(f"no twitter timeline channels configured")
             return
+
+        me = await self.client.user
+        log.info(f"connected to twitter as @{me.screen_name}")
 
         since_id = None
 
@@ -69,7 +69,10 @@ class Twitter(Unit):
                         log.info(f" @{tweet.user.screen_name}: {tweet.text}")
                     tweet = Auto.generate(tweets[-1])
 
-                    if since_id is not None:
+                    if (
+                        since_id is not None
+                        and tweet.user.screen_name != me.screen_name
+                    ):
                         for name in self.config.twitter_timeline_channels:
                             channel = self.slack.channels.get(name, None)
                             if channel:
