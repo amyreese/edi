@@ -92,7 +92,11 @@ class Edi(metaclass=Singleton):
         )
 
         import_units()
-        self.units = {unit: unit(self.slack) for unit in Unit.all_units()}
+        self.units = {
+            unit: unit(self.slack)
+            for unit in Unit.all_units()
+            if unit.__name__ not in self.config.disable_units
+        }
         log.debug(f"starting {len(self.units)} units")
         for result in await asyncio.gather(
             *[unit.start() for unit in self.units.values()], return_exceptions=True
@@ -142,6 +146,18 @@ class Edi(metaclass=Singleton):
 
         try:
             unit_type, args_re, _description = COMMANDS[command]
+            if (
+                command in self.config.disable_commands
+                or unit_type.__name__ in self.config.disable_units
+            ):
+                await self.slack.api(
+                    "chat.postMessage",
+                    as_user=True,
+                    channel=channel.id,
+                    text=f'<@{user.id}> command "{command}" disabled',
+                )
+                return True
+
             match = args_re.match(args)
             if not match:
                 log.warning(f"invalid arguments from {user.name}: {command} {args}")
@@ -149,7 +165,7 @@ class Edi(metaclass=Singleton):
                     "chat.postMessage",
                     as_user=True,
                     channel=channel.id,
-                    text=f"<@{user.id}> invalid arguments to command {command}",
+                    text=f'<@{user.id}> invalid arguments to command "{command}"',
                 )
                 return True
 
@@ -161,7 +177,7 @@ class Edi(metaclass=Singleton):
                     "chat.postMessage",
                     as_user=True,
                     channel=channel.id,
-                    text=f"<@{user.id}> command {command} unavailable",
+                    text=f'<@{user.id}> command "{command}" unavailable',
                 )
                 return True
 
@@ -195,6 +211,12 @@ class Edi(metaclass=Singleton):
 
     async def dispatch(self, event: Event) -> None:
         """Dispatch events to all active units."""
+        if "channel" in event:
+            channel_name = self.slack.channels[event.channel].name
+            if channel_name in self.config.ignore_channels:
+                log.debug(f"ignoring event from channel #{channel_name}")
+                return
+
         handled = await self.command(event)
         if handled:
             return

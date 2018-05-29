@@ -137,6 +137,7 @@ disable=print-statement,
         too-many-branches,
         too-many-nested-blocks,
         too-many-locals,
+        too-many-return-statements,
         broad-except,
         unused-argument,
         duplicate-code

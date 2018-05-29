@@ -17,6 +17,10 @@ class Config:
     log: str = ""
     uvloop: bool = True
 
+    disable_units: List = []
+    disable_commands: List = ["tweet"]
+    ignore_channels: List = []
+
     chatlog_root: str = "~/slacklogs"
     chatlog_format: str = "[{time}] {message}"
 
