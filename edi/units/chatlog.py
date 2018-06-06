@@ -13,7 +13,6 @@ log = logging.getLogger(__name__)
 
 
 class ChatLog(Unit):
-
     async def start(self) -> None:
         config = Edi().config
         self.root = Path(config.chatlog_root).expanduser()

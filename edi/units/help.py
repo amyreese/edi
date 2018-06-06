@@ -15,7 +15,6 @@ log = logging.getLogger(__name__)
 @command("help", description="[command]: show command details")
 @command("hello", description=": <insert witty help text here>")
 class Help(Unit):
-
     async def help(self, channel: Channel, user: User, phrase: str) -> str:
         phrase = phrase.strip().lower()
         detail = bool(phrase)

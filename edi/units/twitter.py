@@ -17,7 +17,6 @@ log = logging.getLogger(__name__)
 
 @command("tweet", description="<status>: twitter a new tweet")
 class Twitter(Unit):
-
     async def start(self) -> None:
         self.config = Edi().config
         if not all(

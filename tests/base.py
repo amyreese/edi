@@ -8,7 +8,6 @@ from typing import Any, Callable
 
 
 def async_test(fn: Callable[..., Any]) -> Callable[..., Any]:
-
     @wraps(fn)
     def wrapper(*args: Any, **kwargs: Any) -> Any:
         loop = asyncio.get_event_loop()
