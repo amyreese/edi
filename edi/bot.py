@@ -65,25 +65,39 @@ class Edi(metaclass=Singleton):
     async def run(self) -> None:
         """Execute all the bits of Edi."""
 
-        try:
-            log.debug(f"connecting to slack")
-            self.slack = Slack(token=self.config.token)
-            async for event in self.slack.rtm():
-                if event.type == "hello":
-                    log.info(
-                        f"connected to {self.slack.team.name} as {self.slack.me.name}"
-                    )
-                    await self.ready()
+        while True:
+            try:
+                log.debug("connecting to slack")
+                self.slack = Slack(token=self.config.token)
+                async for event in self.slack.rtm():
+                    if event.type == "hello":
+                        log.info(
+                            f"connected to {self.slack.team.name} "
+                            f"as {self.slack.me.name}"
+                        )
+                        await self.ready()
 
-                await self.dispatch(event)
+                    if event.type == "goodbye":
+                        log.info("RTM server will disconnect soon")
 
-        except Exception:
-            log.exception(f"run loop exception, stopping")
-            await self.stop()
-            raise
+                    await self.dispatch(event)
+
+                log.info("RTM disconnected")
+
+            except SlackError:
+                log.exception("RTM exception, reconnecting")
+                continue
+
+            except Exception:
+                log.exception("run loop exception, stopping")
+                await self.stop()
+                raise
 
     async def ready(self) -> None:
         """Connected to slack and ready to start units."""
+
+        if self.units:
+            return
 
         self.command_re = re.compile(
             r"^\s*"
