@@ -30,6 +30,7 @@ class Twitter(Unit):
             log.debug(f"missing twitter credentials")
             return
 
+        logging.getLogger('peony').setLevel(logging.WARNING)
         self.client = PeonyClient(
             consumer_key=self.config.twitter_consumer_key,
             consumer_secret=self.config.twitter_consumer_secret,
@@ -80,7 +81,7 @@ class Twitter(Unit):
                     since_id = tweet.id_str
 
                 else:
-                    log.info(f"timeline empty")
+                    log.debug(f"timeline empty")
 
             except PeonyException:
                 log.exception("timeline update failed")
@@ -91,7 +92,7 @@ class Twitter(Unit):
             finally:
                 wait = (ts + 90) - time.time()
                 if wait > 0:
-                    log.info(f"sleeping for {wait}s")
+                    log.debug(f"sleeping for {wait}s")
                     await asyncio.sleep(wait)
 
     @staticmethod
