@@ -30,7 +30,7 @@ class Twitter(Unit):
             log.debug(f"missing twitter credentials")
             return
 
-        logging.getLogger('peony').setLevel(logging.WARNING)
+        logging.getLogger("peony").setLevel(logging.WARNING)
         self.client = PeonyClient(
             consumer_key=self.config.twitter_consumer_key,
             consumer_secret=self.config.twitter_consumer_secret,
