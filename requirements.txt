@@ -8,3 +8,4 @@ cchardet
 click
 ent
 peony-twitter
+toml

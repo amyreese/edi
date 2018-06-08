@@ -7,16 +7,21 @@ from aioslack import Event
 from datetime import datetime
 from pathlib import Path
 
-from edi import Edi, Unit
+from edi import Edi, Unit, Config
 
 log = logging.getLogger(__name__)
 
 
+class chatlog(Config):
+    root: str = "~/slacklogs"
+    format: str = "[{time}] {message}"
+
+
 class ChatLog(Unit):
     async def start(self) -> None:
-        config = Edi().config
-        self.root = Path(config.chatlog_root).expanduser()
-        self.format = config.chatlog_format
+        config: chatlog = Edi().config.chatlog
+        self.root = Path(config.root).expanduser()
+        self.format = config.format
 
     def log_message(self, channel: str, dt: datetime, message: str) -> None:
         # todo: replace <@U0HML87RT> with @username

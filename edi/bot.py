@@ -41,13 +41,13 @@ class Edi(metaclass=Singleton):
         if self._started:
             raise Exception("Edi already started")
 
-        if uvloop and self.config.uvloop:
+        if uvloop and self.config.bot.uvloop:
             log.debug("Using uvloop")
             asyncio.set_event_loop_policy(uvloop.EventLoopPolicy())
 
         self.loop = asyncio.new_event_loop()
 
-        if self.config.debug:
+        if self.config.bot.debug:
             self.loop.set_debug(True)
 
         self.loop.add_signal_handler(signal.SIGINT, self.sigterm)
@@ -68,7 +68,7 @@ class Edi(metaclass=Singleton):
         while True:
             try:
                 log.debug("connecting to slack")
-                self.slack = Slack(token=self.config.token)
+                self.slack = Slack(token=self.config.bot.token)
                 async for event in self.slack.rtm():
                     if event.type == "hello":
                         log.info(
@@ -109,7 +109,7 @@ class Edi(metaclass=Singleton):
         self.units = {
             unit: unit(self.slack)
             for unit in Unit.all_units()
-            if unit.__name__ not in self.config.disable_units
+            if unit.__name__ not in self.config.units.disable_units
         }
         log.debug(f"starting {len(self.units)} units")
         for result in await asyncio.gather(
@@ -161,8 +161,8 @@ class Edi(metaclass=Singleton):
         try:
             unit_type, args_re, _description = COMMANDS[command]
             if (
-                command in self.config.disable_commands
-                or unit_type.__name__ in self.config.disable_units
+                command in self.config.units.disable_commands
+                or unit_type.__name__ in self.config.units.disable_units
             ):
                 await self.slack.api(
                     "chat.postMessage",
@@ -227,7 +227,7 @@ class Edi(metaclass=Singleton):
         """Dispatch events to all active units."""
         if "channel" in event:
             channel_name = self.slack.channels[event.channel].name
-            if channel_name in self.config.ignore_channels:
+            if channel_name in self.config.bot.ignore_channels:
                 log.debug(f"ignoring event from channel #{channel_name}")
                 return
 
@@ -248,7 +248,7 @@ class Edi(metaclass=Singleton):
 def init_from_config(config: Config) -> None:
     """Initialize Edi from a loaded `Config` object."""
 
-    init_logger(stdout=True, file_path=config.log, debug=config.debug)
+    init_logger(stdout=True, file_path=config.bot.log, debug=config.bot.debug)
     log.debug("logger initialized")
 
     Edi(config).start()

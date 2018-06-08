@@ -6,25 +6,35 @@ import logging
 import time
 
 from aioslack.types import Auto, Channel, User
+from attr import dataclass, Factory
 from peony import PeonyClient
 from peony.exceptions import PeonyException
-from typing import Optional
+from typing import List, Optional
 
-from edi import Edi, Unit, command
+from edi import Edi, Unit, command, Config
 
 log = logging.getLogger(__name__)
+
+
+@dataclass
+class twitter(Config):
+    consumer_key: str = ""
+    consumer_secret: str = ""
+    access_key: str = ""
+    access_secret: str = ""
+    timeline_channels: List[str] = Factory(list)
 
 
 @command("tweet", description="<status>: twitter a new tweet")
 class Twitter(Unit):
     async def start(self) -> None:
-        self.config = Edi().config
+        self.config: twitter = Edi().config.twitter
         if not all(
             [
-                self.config.twitter_consumer_key,
-                self.config.twitter_consumer_secret,
-                self.config.twitter_access_key,
-                self.config.twitter_access_secret,
+                self.config.consumer_key,
+                self.config.consumer_secret,
+                self.config.access_key,
+                self.config.access_secret,
             ]
         ):
             log.debug(f"missing twitter credentials")
@@ -32,10 +42,10 @@ class Twitter(Unit):
 
         logging.getLogger("peony").setLevel(logging.WARNING)
         self.client = PeonyClient(
-            consumer_key=self.config.twitter_consumer_key,
-            consumer_secret=self.config.twitter_consumer_secret,
-            access_token=self.config.twitter_access_key,
-            access_token_secret=self.config.twitter_access_secret,
+            consumer_key=self.config.consumer_key,
+            consumer_secret=self.config.consumer_secret,
+            access_token=self.config.access_key,
+            access_token_secret=self.config.access_secret,
         )
 
         self.task = asyncio.ensure_future(self.timeline())
@@ -43,7 +53,7 @@ class Twitter(Unit):
     async def timeline(self) -> None:
         """Run loop, poll for updates and push new posts to slack."""
 
-        if not self.config.twitter_timeline_channels:
+        if not self.config.timeline_channels:
             log.info(f"no twitter timeline channels configured")
             return
 
@@ -73,7 +83,7 @@ class Twitter(Unit):
                         since_id is not None
                         and tweet.user.screen_name != me.screen_name
                     ):
-                        for name in self.config.twitter_timeline_channels:
+                        for name in self.config.timeline_channels:
                             channel = self.slack.channels.get(name, None)
                             if channel:
                                 await self.announce(channel, tweet)

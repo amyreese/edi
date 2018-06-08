@@ -39,10 +39,10 @@ def init_from_cli(
         cfg = Config.load_defaults()
 
     if log is not None:
-        cfg.log = log
+        cfg.bot.log = log
 
     if debug:
-        cfg.debug = True
+        cfg.bot.debug = True
 
     init_from_config(cfg)
 
