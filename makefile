@@ -1,3 +1,8 @@
+venv:
+	python3 -m venv .venv
+	source .venv/bin/activate && make setup dev
+	@echo "$$ source .venv/bin/activate"
+
 setup:
 	python3 -m pip install -U black mypy pylint twine
 	python3 -m pip install -Ur requirements.txt
@@ -21,4 +26,4 @@ test:
 	python3 -m unittest tests
 
 clean:
-	rm -rf build dist README MANIFEST edi_slack.egg-info .mypy_cache
+	rm -rf build dist README MANIFEST *.egg-info .venv .mypy_cache
