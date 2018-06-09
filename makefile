@@ -4,7 +4,7 @@ venv:
 	@echo "$$ source .venv/bin/activate"
 
 setup:
-	python3 -m pip install -U black mypy pylint twine
+	python3 -m pip install -U black isort mypy pylint twine
 	python3 -m pip install -Ur requirements.txt
 
 dev:
@@ -16,6 +16,7 @@ release: lint test clean
 
 black:
 	python3 -m black .
+	python3 -m isort -rc .
 
 lint:
 	python3 -m black --check .

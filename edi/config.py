@@ -1,11 +1,11 @@
 # Copyright 2017 John Reese
 # Licensed under the MIT license
 
-import toml
-
-from attr import dataclass, fields
 from pathlib import Path
 from typing import Any, Dict, List, Mapping
+
+import toml
+from attr import dataclass, fields
 
 
 @dataclass

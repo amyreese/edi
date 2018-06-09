@@ -5,7 +5,6 @@ import logging
 import random
 
 from aioslack import Channel, User
-
 from edi import Unit, command
 from edi.core import COMMANDS
 

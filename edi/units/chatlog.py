@@ -2,12 +2,11 @@
 # Licensed under the MIT license
 
 import logging
-
-from aioslack import Event
 from datetime import datetime
 from pathlib import Path
 
-from edi import Edi, Unit, Config
+from aioslack import Event
+from edi import Config, Edi, Unit
 
 log = logging.getLogger(__name__)
 

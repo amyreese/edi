@@ -3,10 +3,9 @@
 
 import logging
 import re
-
 from typing import Callable, Dict, Pattern, Set, Tuple, Type
 
-from aioslack import Slack, Event
+from aioslack import Event, Slack
 
 log = logging.getLogger(__name__)
 

@@ -5,20 +5,22 @@ import asyncio
 import logging
 import re
 import signal
+from typing import Dict, Optional, Type
+
+from ent import Singleton
+
+from aioslack import Event, Slack, SlackError
+
+from .config import Config
+from .core import COMMANDS, Unit
+from .log import init_logger
+from .units import import_units
 
 try:
     import uvloop
 except ImportError:
     uvloop = None
 
-from aioslack import Event, Slack, SlackError
-from ent import Singleton
-from typing import Dict, Type, Optional
-
-from .config import Config
-from .core import Unit, COMMANDS
-from .log import init_logger
-from .units import import_units
 
 log = logging.getLogger(__name__)
 

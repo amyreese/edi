@@ -4,14 +4,14 @@
 import asyncio
 import logging
 import time
-
-from aioslack.types import Auto, Channel, User
-from attr import dataclass, Factory
-from peony import PeonyClient
-from peony.exceptions import PeonyException
 from typing import List, Optional
 
-from edi import Edi, Unit, command, Config
+from attr import Factory, dataclass
+from peony import PeonyClient
+from peony.exceptions import PeonyException
+
+from aioslack.types import Auto, Channel, User
+from edi import Config, Edi, Unit, command
 
 log = logging.getLogger(__name__)
 
