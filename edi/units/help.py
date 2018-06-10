@@ -28,6 +28,7 @@ class Help(Unit):
         helps = []
         for name in sorted(command_list):
             _unit, args, description = COMMANDS[name]
+            description = description.strip()  # handle blockquote descriptions
             if detail:
                 description = "\n".join(
                     f"    {line.strip()}" for line in description.splitlines()
