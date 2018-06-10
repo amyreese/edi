@@ -171,8 +171,35 @@ class Quotes(Unit):
 
         self.recents: Dict[str, Dict[str, str]] = defaultdict(dict)
 
-        qs = await self.db.find("bots", limit=1)
-        print(f"{qs}")
+    @command(
+        r"(?P<username>\S+)", description="<username>: grab the user's last message"
+    )
+    async def grab(self, channel: Channel, user: User, username: str) -> str:
+        username = self.slack.decode(username, prefix="")
+        text = self.recents[channel.name].get(username, None)
+        if text is None:
+            return f"no history for {username}"
+
+        q = Quote.new(channel.name, username, user.name, text)
+        await self.db.add(q)
+
+        if self.config.tweet_grabs:
+            try:
+                twitter = Edi().units.get(Twitter, None)
+                if twitter is not None:
+                    tweet = self.config.tweet_format.format(
+                        id=q.id, channel=q.channel, username=q.username, text=q.text
+                    )
+                    await twitter.update(tweet)
+                    return f"quote #{q.id} saved and tweeted"
+
+                else:
+                    log.debug(f"Twitter unit not active")
+
+            except Exception:
+                log.exception(f"failed to tweet quote #{q.id}")
+
+        return f"quote #{q.id} saved"
 
     @command(
         r"(?:#?(?P<qid>\d+)|(?P<limit>\d+)?\s*(?P<username>\S+))?",
@@ -210,36 +237,6 @@ class Quotes(Unit):
         if not qs:
             return "no quotes found"
         return "\n".join(f"#{q.id} [{q.added_at}] <{q.username}> {q.text}" for q in qs)
-
-    @command(
-        r"(?P<username>\S+)", description="<username>: grab the user's last message"
-    )
-    async def grab(self, channel: Channel, user: User, username: str) -> str:
-        username = self.slack.decode(username, prefix="")
-        text = self.recents[channel.name].get(username, None)
-        if text is None:
-            return f"no history for {username}"
-
-        q = Quote.new(channel.name, username, user.name, text)
-        await self.db.add(q)
-
-        if self.config.tweet_grabs:
-            try:
-                twitter = Edi().units.get(Twitter, None)
-                if twitter is not None:
-                    tweet = self.config.tweet_format.format(
-                        id=q.id, channel=q.channel, username=q.username, text=q.text
-                    )
-                    await twitter.update(tweet)
-                    return f"quote #{q.id} saved and tweeted"
-
-                else:
-                    log.debug(f"Twitter unit not active")
-
-            except Exception:
-                log.exception(f"failed to tweet quote #{q.id}")
-
-        return f"quote #{q.id} saved"
 
     async def on_message(self, event: Event) -> None:
         if "user" not in event or "subtype" in event:
