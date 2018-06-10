@@ -5,13 +5,13 @@ import inspect
 import logging
 import re
 from types import FunctionType
-from typing import Callable, Dict, List, Pattern, Set, Tuple, Type, TypeVar
+from typing import Any, Callable, Dict, Pattern, Set, Tuple, Type, TypeVar
 
 from aioslack import Event, Slack
 
 log = logging.getLogger(__name__)
 
-COMMANDS: Dict[str, Tuple[Type["Unit"], Pattern, str]] = {}
+COMMANDS: Dict[str, Tuple[Any, Pattern, str]] = {}
 T = TypeVar("T", bound=FunctionType)
 
 
