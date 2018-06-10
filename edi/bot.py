@@ -219,9 +219,7 @@ class Edi(metaclass=Singleton):
                 log.debug(f"ignoring event from channel #{channel_name}")
                 return
 
-        handled = await self.command(event)
-        if handled:
-            return
+        await self.command(event)
 
         results = await asyncio.gather(
             *[unit.dispatch(event) for unit in self.units.values()],
