@@ -154,20 +154,6 @@ class QuoteDB:
             return Quote(*row)
 
 
-@command(
-    "grab", r"(?P<username>\w+)", description="<username>: grab the user's last message"
-)
-@command(
-    "quote",
-    r"(?:#?(?P<qid>\d+)|(?P<limit>\d+)?\s*(?P<username>\w+))?",
-    description="""
-        [<id> | [<count>] <username>]: show recent quotes
-
-        id: integer - show a specific quote by ID
-        count: integer - how many quotes to show
-        username: string - only show quotes for the given username
-    """,
-)
 class Quotes(Unit):
     async def start(self) -> None:
         self.config = Edi().config.quotes
@@ -179,6 +165,16 @@ class Quotes(Unit):
         qs = await self.db.find("bots", limit=1)
         print(f"{qs}")
 
+    @command(
+        r"(?:#?(?P<qid>\d+)|(?P<limit>\d+)?\s*(?P<username>\w+))?",
+        description="""
+            [<id> | [<count>] <username>]: show recent quotes
+
+            id: integer - show a specific quote by ID
+            count: integer - how many quotes to show
+            username: string - only show quotes for the given username
+        """,
+    )
     async def quote(
         self,
         channel: Channel,
@@ -205,6 +201,9 @@ class Quotes(Unit):
             return "no quotes found"
         return "\n".join(f"#{q.id} [{q.added_at}] <{q.nick}> {q.text}" for q in qs)
 
+    @command(
+        r"(?P<username>\w+)", description="<username>: grab the user's last message"
+    )
     async def grab(self, channel: Channel, user: User, username: str) -> str:
         text = self.recents[channel.name].get(username, None)
         if text is None:

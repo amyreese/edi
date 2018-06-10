@@ -1,34 +1,62 @@
 # Copyright 2016 John Reese
 # Licensed under the MIT license
 
+import inspect
 import logging
 import re
-from typing import Callable, Dict, Pattern, Set, Tuple, Type
+from types import FunctionType
+from typing import Callable, Dict, List, Pattern, Set, Tuple, Type, TypeVar
 
 from aioslack import Event, Slack
 
 log = logging.getLogger(__name__)
 
 COMMANDS: Dict[str, Tuple[Type["Unit"], Pattern, str]] = {}
+T = TypeVar("T", bound=FunctionType)
 
 
 def command(
-    name: str, args: str = r"(.*)", description: str = ""
-) -> Callable[[Type["Unit"]], Type["Unit"]]:
+    args: str = r"(.*)", name: str = "", description: str = ""
+) -> Callable[[T], T]:
     """Decorator for automating command/args declaration and dispatch."""
-    name = name.lower()
 
-    def wrapper(cls: Type["Unit"]) -> Type["Unit"]:
-        unit_type = cls
+    def wrapper(fn: T) -> T:
+        if fn.__name__ == fn.__qualname__:
+            # TODO: maybe handle raw functions
+            raise ValueError("@command takes class methods only")
 
-        if name in COMMANDS:
+        cmd = name.lower() if name else fn.__name__.lower()
+        if cmd in COMMANDS:
             unit, _regex, _description = COMMANDS[name]
-            raise ValueError(f'command "{name}" already claimed by {unit.__name__}')
-        COMMANDS[name] = (unit_type, re.compile(args), description)
+            raise ValueError(f'command "{cmd}" already claimed by {unit.__name__}')
 
-        return cls
+        module = inspect.getmodule(fn)
+        cls_name = fn.__qualname__.split(".")[0]
+        fn_name = fn.__name__
+
+        COMMANDS[cmd] = ((module, cls_name, fn_name), re.compile(args), description)
+
+        return fn
 
     return wrapper
+
+
+def materialize_commands(units: Dict[Type["Unit"], "Unit"]) -> None:
+    for name in list(COMMANDS):
+        info, args, description = COMMANDS[name]
+        try:
+            module, cls_name, fn_name = info
+            cls = getattr(module, cls_name)
+            method = None
+            instance = units[cls]
+            method = getattr(instance, fn_name)
+            if method:
+                COMMANDS[name] = method, args, description
+            else:
+                raise AttributeError(f"no active unit of {cls} with method {fn_name}")
+
+        except (AttributeError, KeyError):
+            COMMANDS.pop(name)
 
 
 class Unit:

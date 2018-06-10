@@ -25,7 +25,6 @@ class twitter(Config):
     timeline_channels: List[str] = Factory(list)
 
 
-@command("tweet", description="<status>: twitter a new tweet")
 class Twitter(Unit):
     async def start(self) -> None:
         self.config: twitter = Edi().config.twitter
@@ -129,6 +128,7 @@ class Twitter(Unit):
             log.exception("failed to update status")
             return None
 
+    @command(description="<status>: twitter a new tweet")
     async def tweet(self, channel: Channel, user: User, status: str) -> str:
         tweet = await self.update(status)
         if tweet is not None:

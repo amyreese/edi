@@ -11,9 +11,8 @@ from edi.core import COMMANDS
 log = logging.getLogger(__name__)
 
 
-@command("help", description="[command]: show command details")
-@command("hello", description=": <insert witty help text here>")
 class Help(Unit):
+    @command(description="[command]: show command details")
     async def help(self, channel: Channel, user: User, phrase: str) -> str:
         phrase = phrase.strip().lower()
         detail = bool(phrase)
@@ -53,6 +52,7 @@ class Help(Unit):
 
         return text
 
+    @command(description=": <insert witty help text here>")
     async def hello(self, channel: Channel, user: User, phrase: str) -> str:
         # http://masseffect.wikia.com/wiki/Legion/Unique_dialogue
         humor = [

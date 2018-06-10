@@ -12,7 +12,7 @@ from ent import Singleton
 from aioslack import Event, Slack, SlackError
 
 from .config import Config
-from .core import COMMANDS, Unit
+from .core import COMMANDS, Unit, materialize_commands
 from .log import init_logger
 from .units import import_units
 
@@ -113,6 +113,7 @@ class Edi(metaclass=Singleton):
             for unit in Unit.all_units()
             if unit.__name__ not in self.config.units.disable_units
         }
+        materialize_commands(self.units)
         log.debug(f"starting {len(self.units)} units")
         for result in await asyncio.gather(
             *[unit.start() for unit in self.units.values()], return_exceptions=True
@@ -161,11 +162,8 @@ class Edi(metaclass=Singleton):
             return False
 
         try:
-            unit_type, args_re, _description = COMMANDS[command]
-            if (
-                command in self.config.units.disable_commands
-                or unit_type.__name__ in self.config.units.disable_units
-            ):
+            method, args_re, _description = COMMANDS[command]
+            if command in self.config.units.disable_commands:
                 await self.slack.api(
                     "chat.postMessage",
                     as_user=True,
@@ -182,18 +180,6 @@ class Edi(metaclass=Singleton):
                     as_user=True,
                     channel=channel.id,
                     text=f'<@{user.id}> invalid arguments to command "{command}"',
-                )
-                return True
-
-            unit = self.units[unit_type]
-            method = getattr(unit, command, None)
-            if method is None:
-                log.warning(f"no method {command} on unit {unit_type.__name__}")
-                await self.slack.api(
-                    "chat.postMessage",
-                    as_user=True,
-                    channel=channel.id,
-                    text=f'<@{user.id}> command "{command}" unavailable',
                 )
                 return True
 
