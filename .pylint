@@ -134,13 +134,15 @@ disable=print-statement,
         too-few-public-methods,
         wrong-import-order,
         attribute-defined-outside-init,
+        too-many-arguments,
         too-many-branches,
         too-many-nested-blocks,
         too-many-locals,
         too-many-return-statements,
         broad-except,
         unused-argument,
-        duplicate-code
+        duplicate-code,
+        fixme
 
 # Enable the message, report, category or checker with the given id(s). You can
 # either give multiple identifier separated by comma (,) or put this option
